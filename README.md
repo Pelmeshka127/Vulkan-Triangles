@@ -1,2 +1,2 @@
-# jubilant-octo-spork
+# Vulkan-Triangles
 My attempt to implement triangles visualization with Vulkan API ...
