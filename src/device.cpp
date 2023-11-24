@@ -1,4 +1,4 @@
-#include "device.hpp"
+#include "../inc/device.hpp"
 
 #include <cstring>
 #include <iostream>

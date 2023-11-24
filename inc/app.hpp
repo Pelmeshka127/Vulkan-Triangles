@@ -47,9 +47,9 @@ class App
 
         Window                          window_{WIDTH, HEIGHT, "Hello Vulkan!"};
         
-        Device                          device_{Window};
+        Device                          device_{window_};
         
-        SwapChain                       swap_chain_{Device, Window.getExtent()};
+        SwapChain                       swap_chain_{device_, window_.GetExtent()};
         
         std::unique_ptr<Pipeline>       pipeline_;
         
