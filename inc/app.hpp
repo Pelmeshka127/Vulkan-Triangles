@@ -42,14 +42,20 @@ class App
         void CreatePipeline();
         
         void CreateCommandBuffers();
+
+        void FreeCommandBuffers();
         
         void DrawFrame();
+
+        void RecreateSwapChain();
+
+        void RecordCommandBuffer(int ImageIndex);
 
         Window                          window_{WIDTH, HEIGHT, "Hello Vulkan!"};
         
         Device                          device_{window_};
         
-        SwapChain                       swap_chain_{device_, window_.GetExtent()};
+        std::unique_ptr<SwapChain>      swap_chain_;
         
         std::unique_ptr<Pipeline>       pipeline_;
         

@@ -19,10 +19,6 @@ struct PipelineConfigInfo {
     
     PipelineConfigInfo& operator=(const PipelineConfigInfo&) = delete;
 
-    VkViewport                                  viewport;
-    
-    VkRect2D                                    scissor;
-    
     VkPipelineViewportStateCreateInfo           viewportInfo;
     
     VkPipelineInputAssemblyStateCreateInfo      inputAssemblyInfo;
@@ -36,6 +32,10 @@ struct PipelineConfigInfo {
     VkPipelineColorBlendStateCreateInfo         colorBlendInfo;
     
     VkPipelineDepthStencilStateCreateInfo       depthStencilInfo;
+
+    std::vector<VkDynamicState>                 dynamicStateEnables;
+
+    VkPipelineDynamicStateCreateInfo            dynamicStateInfo;
     
     VkPipelineLayout                            pipelineLayout = nullptr;
     
@@ -64,8 +64,7 @@ class Pipeline
 
         void Bind(VkCommandBuffer commandBuffer);
 
-        static void DefaultPipelineConfigInfo(
-            PipelineConfigInfo& configInfo, uint32_t width, uint32_t height);
+        static void DefaultPipelineConfigInfo(PipelineConfigInfo& configInfo);
 
     private:
         
