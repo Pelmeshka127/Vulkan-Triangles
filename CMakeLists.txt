@@ -13,7 +13,7 @@ if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE Release)
 endif()
 
-find_package(Gtest REQUIRED)
+find_package(GTest REQUIRED)
 enable_testing()
 
 add_subdirectory(./src)
