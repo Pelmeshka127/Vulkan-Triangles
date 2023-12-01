@@ -59,12 +59,19 @@ class SwapChain
         VkResult SubmitCommandBuffers(const VkCommandBuffer *buffers, uint32_t *imageIndex);
 
     private:
+        
         void Init();
+        
         void CreateSwapChain();
+        
         void CreateImageViews();
+        
         void CreateDepthResources();
+        
         void CreateRenderPass();
+        
         void CreateFramebuffers();
+        
         void CreateSyncObjects();
 
         // Helper functions
@@ -75,27 +82,39 @@ class SwapChain
         VkExtent2D ChooseSwapExtent(const VkSurfaceCapabilitiesKHR &capabilities);
 
         VkFormat            swapChainImageFormat;
+        
         VkExtent2D          swapChainExtent;
 
         std::vector<VkFramebuffer>  swapChainFramebuffers;
+        
         VkRenderPass                renderPass;
 
         std::vector<VkImage>        depthImages;
+        
         std::vector<VkDeviceMemory> depthImageMemorys;
+        
         std::vector<VkImageView>    depthImageViews;
+        
         std::vector<VkImage>        swapChainImages;
+        
         std::vector<VkImageView>    swapChainImageViews;
 
         Device      &device;
+        
         VkExtent2D  windowExtent;
 
         VkSwapchainKHR              swapChain;
+        
         std::shared_ptr<SwapChain>  oldSwapChain;
 
         std::vector<VkSemaphore>    imageAvailableSemaphores;
+        
         std::vector<VkSemaphore>    renderFinishedSemaphores;
+        
         std::vector<VkFence>        inFlightFences;
+        
         std::vector<VkFence>        imagesInFlight;
+        
         size_t                      currentFrame = 0;
 };
 
