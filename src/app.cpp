@@ -1,16 +1,27 @@
 #include "../inc/app.hpp"
 
+#define GLM_FORCE_RADIANS
+#define GLM_FORCE_DEPTH_ZERO_TO_ONE
+#include <glm/glm.hpp>
+#include <glm/gtc/constants.hpp>
+
 #include <array>
 #include <stdexcept>
 
 namespace Vulkan 
 {
 
+struct SimplePushConstantData { //
+    glm::mat2 transform{1.f}; //
+    glm::vec2 offset; //
+    alignas(16) glm::vec3 color; //
+}; //
+
 //-------------------------------------------------------------------------------//
 
 App::App() 
 {
-    LoadModels();
+    LoadObjects();
     
     CreatePipelineLayout();
     
@@ -42,32 +53,53 @@ void App::RunApplication()
 
 //-------------------------------------------------------------------------------//
 
-void App::LoadModels() 
+void App::LoadObjects() 
 {
     std::vector<Model::Vertex> vertices{
-        {{-0.5f, -0.5f}, {0.0f, 0.0f, 1.0f}}, 
-        {{0.5f, 0.5f},  {0.0f, 0.0f, 1.0f}},
+        {{-0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}}, 
+        {{0.5f, 0.5f},  {0.0f, 1.0f, 0.0f}},
         {{-0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}},
 
-        {{0.5f, 0.5f}, {1.0f, 0.0f, 0.0f}}, 
-        {{-0.5f, 0.5f},  {1.0f, 0.0f, 0.0f}},
-        {{0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}},
+        // {{0.5f, 0.5f}, {0.0f, 1.0f, 0.0f}}, 
+        // {{-0.5f, 0.5f},  {1.0f, 0.0f, 0.0f}},
+        // {{0.5f, -0.5f}, {0.0f, 0.0f, 1.0f}},
     };
     
-    model_ = std::make_unique<Model>(device_, vertices);
+    auto model = std::make_shared<Model>(device_, vertices);
+
+    auto triangle = Object::CreateObject();
+
+    triangle.model = model;
+    
+    // triangle.color = {.1f, .8f, .1f};
+    
+    triangle.transform2d.translation.x = .2f;
+
+    triangle.transform2d.translation.y = .2f;
+    
+    triangle.transform2d.scale = {.4f, .4f};
+    
+    triangle.transform2d.rotation = .25f * glm::two_pi<float>();
+
+    objects_.push_back(std::move(triangle));
 }
 
 //-------------------------------------------------------------------------------//
 
 void App::CreatePipelineLayout() 
-{
+{ 
+    VkPushConstantRange pushConstantRange{};  //
+    pushConstantRange.stageFlags = VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT; // 
+    pushConstantRange.offset = 0; // 
+    pushConstantRange.size = sizeof(SimplePushConstantData); //
+
     VkPipelineLayoutCreateInfo pipelineLayoutInfo{};
     
     pipelineLayoutInfo.sType                    = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
     pipelineLayoutInfo.setLayoutCount           = 0;
     pipelineLayoutInfo.pSetLayouts              = nullptr;
-    pipelineLayoutInfo.pushConstantRangeCount   = 0;
-    pipelineLayoutInfo.pPushConstantRanges      = nullptr;
+    pipelineLayoutInfo.pushConstantRangeCount   = 1;
+    pipelineLayoutInfo.pPushConstantRanges      = &pushConstantRange;
     
     if (vkCreatePipelineLayout(device_.device(), &pipelineLayoutInfo, nullptr, &pipeline_layout_) !=
         VK_SUCCESS) 
@@ -207,14 +239,47 @@ void App::RecordCommandBuffer(int ImageIndex)
     vkCmdSetViewport(commandBuffers[ImageIndex], 0, 1, &viewport);
     vkCmdSetScissor(commandBuffers[ImageIndex], 0, 1, &scissor);
 
-    pipeline_->Bind(commandBuffers[ImageIndex]);
-    model_->Bind(commandBuffers[ImageIndex]);
-    model_->Draw(commandBuffers[ImageIndex]);
+    RenderObjects(commandBuffers[ImageIndex]);
 
     vkCmdEndRenderPass(commandBuffers[ImageIndex]);
     
     if (vkEndCommandBuffer(commandBuffers[ImageIndex]) != VK_SUCCESS) 
         throw std::runtime_error("failed to record command buffer!");
+}
+
+//-------------------------------------------------------------------------------//
+
+void App::RenderObjects(VkCommandBuffer CommandBuffer)
+{
+    static double d = 0.001f;
+
+    d += 0.001f;
+
+    if (d >= 1)
+        d = 0.001;
+    
+    pipeline_->Bind(CommandBuffer);
+
+    for (auto& obj : objects_) 
+    {
+        obj.transform2d.rotation = glm::mod(obj.transform2d.rotation + 0.01f, glm::two_pi<float>());
+
+        SimplePushConstantData push{};
+        push.offset = obj.transform2d.translation;
+        push.color = {0.5 + d * 0.5, d, 1 - d};
+        push.transform = obj.transform2d.mat2();
+
+        vkCmdPushConstants(
+            CommandBuffer,
+            pipeline_layout_,
+            VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT,
+            0,
+            sizeof(SimplePushConstantData),
+            &push);
+
+        obj.model->Bind(CommandBuffer);
+        obj.model->Draw(CommandBuffer);
+    }
 }
 
 //-------------------------------------------------------------------------------//

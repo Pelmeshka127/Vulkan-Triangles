@@ -2,7 +2,7 @@
 #define APP_HPP_
 
 #include "device.hpp"
-#include "model.hpp"
+#include "object.hpp"
 #include "pipeline.hpp"
 #include "swap_chain.hpp"
 #include "window.hpp"
@@ -35,7 +35,7 @@ class App
 
     private:
     
-        void LoadModels();
+        void LoadObjects();
         
         void CreatePipelineLayout();
         
@@ -51,6 +51,8 @@ class App
 
         void RecordCommandBuffer(int ImageIndex);
 
+        void RenderObjects(VkCommandBuffer CommandBuffer);
+
         Window                          window_{WIDTH, HEIGHT, "Hello Vulkan!"};
         
         Device                          device_{window_};
@@ -63,7 +65,7 @@ class App
         
         std::vector<VkCommandBuffer>    commandBuffers;
         
-        std::unique_ptr<Model>          model_;
+        std::vector<Object>             objects_;
 };
 
 //-------------------------------------------------------------------------------//
