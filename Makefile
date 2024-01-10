@@ -8,8 +8,8 @@ vertObjFiles 	= 	$(patsubst %.vert, %.vert.spv, $(vertSources))
 fragSources 	= 	$(shell find ./shaders -type f -name "*.frag")
 fragObjFiles 	= 	$(patsubst %.frag, %.frag.spv, $(fragSources))
 
-app: main.cpp ./src/app.cpp ./src/window.cpp ./src/device.cpp ./src/model.cpp ./src/pipeline.cpp ./src/swap_chain.cpp
-	g++ $(CFLAGS) -o app main.cpp ./src/app.cpp ./src/window.cpp ./src/device.cpp ./src/model.cpp ./src/pipeline.cpp ./src/swap_chain.cpp $(LDFLAGS)
+app: main.cpp ./src/app.cpp ./src/window.cpp ./src/device.cpp ./src/model.cpp ./src/pipeline.cpp ./src/swap_chain.cpp ./src/render.cpp ./src/render_system.cpp
+	g++ $(CFLAGS) -o app main.cpp ./src/app.cpp ./src/window.cpp ./src/device.cpp ./src/model.cpp ./src/pipeline.cpp ./src/swap_chain.cpp  ./src/render.cpp ./src/render_system.cpp $(LDFLAGS)
 
 .PHONY: test clean
 
