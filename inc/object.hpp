@@ -4,26 +4,29 @@
 #include "model.hpp"
 
 #include <memory>
+#include <glm/gtc/matrix_transform.hpp>
 
 namespace Vulkan 
 {
 
-struct Transform2dComponent {
-    glm::vec2 translation{};
-    glm::vec2 scale{1.f, 1.f};
-    float rotation;
+struct TransformComponent {
+    glm::vec3 translation{};
+    glm::vec3 scale{1.f, 1.f, 1.f};
+    glm::vec3 rotation{};
 
-    glm::mat2 mat2()
+    glm::mat4 mat4()
     {
-        const float sinus   = glm::sin(rotation);
+        auto transform = glm::translate(glm::mat4(1.f), translation);
 
-        const float cosinus = glm::cos(rotation);
+        transform = glm::rotate(transform, rotation.y, {1.f, 0.f, 0.f});
 
-        glm::mat2 RotMatrix{{cosinus, sinus}, {sinus, cosinus}};
+        transform = glm::rotate(transform, rotation.x, {0.f, 0.f, 1.f});
 
-        glm::mat2 ScaleMatrix{{scale.x, .0f}, {.0f, scale.y}};
+        transform = glm::rotate(transform, rotation.z, {1.f, 0.f, 0.f});
 
-        return RotMatrix * ScaleMatrix;
+        transform = glm::scale(transform, scale);
+
+        return transform;
     }
 };
 
@@ -52,7 +55,7 @@ class Object
         
         glm::vec3 color{};
         
-        Transform2dComponent transform2d{};
+        TransformComponent transform{};
 };
 
 } // end of vulkan namespace

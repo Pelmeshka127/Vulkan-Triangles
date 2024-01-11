@@ -36,6 +36,8 @@ class App
     
         void LoadObjects();
         
+        std::unique_ptr<Model> CreateTriangleModel(Device &device, glm::vec3 offset);
+        
         Window                          window_{WIDTH, HEIGHT, "Hello Vulkan!"};
         
         Device                          device_{window_};

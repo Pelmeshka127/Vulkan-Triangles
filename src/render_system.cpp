@@ -13,8 +13,7 @@ namespace Vulkan
 {
 
 struct SimplePushConstantData { //
-    glm::mat2 transform{1.f}; //
-    glm::vec2 offset; //
+    glm::mat4 transform{1.f}; //
     alignas(16) glm::vec3 color; //
 }; //
 
@@ -83,23 +82,15 @@ void RenderSystem::CreatePipeline(VkRenderPass render_pass)
 
 void RenderSystem::RenderObjects(VkCommandBuffer CommandBuffer, std::vector<Object>& objects)
 {
-    static double d = 0.001f;
-
-    d += 0.001f;
-
-    if (d >= 1)
-        d = 0.001;
-    
     pipeline_->Bind(CommandBuffer);
 
     for (auto& obj : objects) 
     {
-        obj.transform2d.rotation = glm::mod(obj.transform2d.rotation + 0.01f, glm::two_pi<float>());
+        obj.transform.rotation.y = glm::mod(obj.transform.rotation.y + 0.01f, glm::two_pi<float>());
+        obj.transform.rotation.x = glm::mod(obj.transform.rotation.x + 0.005f, glm::two_pi<float>());
 
         SimplePushConstantData push{};
-        push.offset = obj.transform2d.translation;
-        push.color = {0.5 + d * 0.5, d, 1 - d};
-        push.transform = obj.transform2d.mat2();
+        push.transform = obj.transform.mat4();
 
         vkCmdPushConstants(
             CommandBuffer,

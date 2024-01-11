@@ -49,33 +49,54 @@ void App::RunApplication()
 
 //-------------------------------------------------------------------------------//
 
-void App::LoadObjects() 
+std::unique_ptr<Model> App::CreateTriangleModel(Device &device, glm::vec3 offset)
 {
     std::vector<Model::Vertex> vertices{
-        {{-0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}}, 
-        {{0.5f, 0.5f},  {0.0f, 1.0f, 0.0f}},
-        {{-0.5f, 0.5f}, {0.0f, 0.0f, 1.0f}},
 
-        {{0.5f, 0.5f}, {0.0f, 1.0f, 0.0f}}, 
-        {{-0.5f, 0.5f},  {1.0f, 0.0f, 0.0f}},
-        {{0.5f, -0.5f}, {0.0f, 0.0f, 1.0f}},
+        {{-.5f, -.5f, -.5f}, {.9f, .9f, .9f}},
+        {{-.5f, .5f, .5f}, {.9f, .9f, .9f}},
+        {{-.5f, -.5f, .5f}, {.9f, .9f, .9f}},
+
+        {{.5f, -.5f, -.5f}, {.8f, .8f, .1f}},
+        {{.5f, .5f, .5f}, {.8f, .8f, .1f}},
+        {{.5f, -.5f, .5f}, {.8f, .8f, .1f}},
+
+        {{-.5f, -.5f, -.5f}, {.9f, .6f, .1f}},
+        {{.5f, -.5f, .5f}, {.9f, .6f, .1f}},
+        {{-.5f, -.5f, .5f}, {.9f, .6f, .1f}},
+
+        {{-.5f, .5f, -.5f}, {.8f, .1f, .1f}},
+        {{.5f, .5f, .5f}, {.8f, .1f, .1f}},
+        {{-.5f, .5f, .5f}, {.8f, .1f, .1f}},
+
+        {{-.5f, -.5f, 0.5f}, {.1f, .1f, .8f}},
+        {{.5f, .5f, 0.5f}, {.1f, .1f, .8f}},
+        {{-.5f, .5f, 0.5f}, {.1f, .1f, .8f}},
+
+        {{-.5f, -.5f, -0.5f}, {.1f, .8f, .1f}},
+        {{.5f, .5f, -0.5f}, {.1f, .8f, .1f}},
+        {{-.5f, .5f, -0.5f}, {.1f, .8f, .1f}},
     };
-    
-    auto model = std::make_shared<Model>(device_, vertices);
+
+    for (auto& v : vertices) {
+        v.position += offset;
+    }
+    return std::make_unique<Model>(device, vertices);
+}
+
+//-------------------------------------------------------------------------------//
+
+void App::LoadObjects() 
+{
+    std::shared_ptr<Model> model = CreateTriangleModel(device_, {0.f, 0.f, 0.f});
 
     auto triangle = Object::CreateObject();
 
     triangle.model = model;
-    
-    triangle.color = {.1f, .8f, .1f};
-    
-    triangle.transform2d.translation.x = .2f;
 
-    triangle.transform2d.translation.y = .2f;
-    
-    triangle.transform2d.scale = {.4f, .4f};
-    
-    triangle.transform2d.rotation = .25f * glm::two_pi<float>();
+    triangle.transform.translation = {0.f, 0.f, 0.5f};
+
+    triangle.transform.scale       = {.5f, .5f, .5f};
 
     objects_.push_back(std::move(triangle));
 }
