@@ -4,6 +4,7 @@
 #include "device.hpp"
 #include "object.hpp"
 #include "pipeline.hpp"
+#include "camera.hpp"
 
 #include <memory>
 #include <vector>
@@ -26,7 +27,7 @@ class RenderSystem
         RenderSystem &operator=(const RenderSystem &) = delete;
 
         
-        void RenderObjects(VkCommandBuffer CommandBuffer, std::vector<Object>& objects);
+        void RenderObjects(VkCommandBuffer CommandBuffer, std::vector<Object>& objects, const Camera& camera);
 
     private:
     

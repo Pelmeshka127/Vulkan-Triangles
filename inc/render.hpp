@@ -29,6 +29,8 @@ class Render
 
         VkRenderPass GetSwapChainRenderPass() const { return swap_chain_->GetRenderPass(); }
 
+        float GetAspectRatio() const { return swap_chain_->ExtentAspectRatio(); }
+
         bool IsFrameInProgress() const { return is_frame_started_; }
 
         VkCommandBuffer GetCurrentCommandBuffer() const 

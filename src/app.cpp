@@ -27,16 +27,24 @@ App::~App() {}
 void App::RunApplication() 
 {
     RenderSystem render_system{device_, render_.GetSwapChainRenderPass()};
+    
+    Camera camera{};
 
     while (!window_.ShouldClose()) 
     {
         glfwPollEvents();
+
+        float aspect = render_.GetAspectRatio();
+
+        camera.SetOrthographProjection(-aspect, aspect, -1, 1, -1, 1);
+
+        camera.SetPerspectiveProjection(glm::radians(50.f), aspect, 0.1f, 10.f);
         
         if (auto command_buffer = render_.BeginFrame())
         {
             render_.BeginSwapChainRenderPass(command_buffer);
 
-            render_system.RenderObjects(command_buffer, objects_);
+            render_system.RenderObjects(command_buffer, objects_, camera);
 
             render_.EndSwapChainRenderPass(command_buffer);
 
@@ -94,7 +102,7 @@ void App::LoadObjects()
 
     triangle.model = model;
 
-    triangle.transform.translation = {0.f, 0.f, 0.5f};
+    triangle.transform.translation = {0.f, 0.f, 2.5f};
 
     triangle.transform.scale       = {.5f, .5f, .5f};
 

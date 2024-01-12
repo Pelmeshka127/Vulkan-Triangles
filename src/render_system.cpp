@@ -80,7 +80,7 @@ void RenderSystem::CreatePipeline(VkRenderPass render_pass)
 
 //-------------------------------------------------------------------------------//
 
-void RenderSystem::RenderObjects(VkCommandBuffer CommandBuffer, std::vector<Object>& objects)
+void RenderSystem::RenderObjects(VkCommandBuffer CommandBuffer, std::vector<Object>& objects, const Camera& camera)
 {
     pipeline_->Bind(CommandBuffer);
 
@@ -90,7 +90,8 @@ void RenderSystem::RenderObjects(VkCommandBuffer CommandBuffer, std::vector<Obje
         obj.transform.rotation.x = glm::mod(obj.transform.rotation.x + 0.005f, glm::two_pi<float>());
 
         SimplePushConstantData push{};
-        push.transform = obj.transform.mat4();
+        push.color      = obj.color;
+        push.transform  = camera.GetProjection() * obj.transform.mat4();
 
         vkCmdPushConstants(
             CommandBuffer,
