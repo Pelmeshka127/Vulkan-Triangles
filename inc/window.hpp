@@ -49,6 +49,8 @@ class Window
 
         void ResetWindowResizeFlag() { frameBufferResized_ = false; }
 
+        GLFWwindow* GetWindow() const { return window_; }
+
         void CreateWindowSurface(VkInstance instance, VkSurfaceKHR *surface);
 };
 

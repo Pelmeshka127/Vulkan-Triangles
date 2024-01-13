@@ -23,7 +23,7 @@ class Camera
 
         void SetViewTarget(glm::vec3 camera_position, glm::vec3 camera_target, glm::vec3 up = glm::vec3(0.f, -1.f, 0.f));
 
-        void SetViewXZX(glm::vec3 position, glm::vec3 rotation);
+        void SetViewYXZ(glm::vec3 position, glm::vec3 rotation);
 
         const glm::mat4& GetProjection() const { return projection_matrix_; }
 

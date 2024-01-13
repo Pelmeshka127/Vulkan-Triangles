@@ -1,5 +1,7 @@
 #include "../inc/app.hpp"
 #include "../inc/render_system.hpp"
+#include "../inc/keyboard.hpp"
+#include "../inc/camera.hpp"
 
 #define GLM_FORCE_RADIANS
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
@@ -8,6 +10,8 @@
 
 #include <array>
 #include <stdexcept>
+#include <cassert>
+#include <chrono>
 
 namespace Vulkan 
 {
@@ -30,13 +34,25 @@ void App::RunApplication()
     
     Camera camera{};
 
-    camera.SetViewDirection(glm::vec3(0.f), glm::vec3(0.5f, 0.f, 1.f));
+    auto viewer_object = Object::CreateObject();
 
-    camera.SetViewTarget(glm::vec3(-1.f, -2.f, 2.f), glm::vec3(0.f, 0.f, 2.5f));
+    auto current_time = std::chrono::high_resolution_clock::now();
+
+    Keyboard camera_controller{};
 
     while (!window_.ShouldClose()) 
     {
         glfwPollEvents();
+
+        auto new_time = std::chrono::high_resolution_clock::now();
+
+        float frame_time = std::chrono::duration<float, std::chrono::seconds::period>(new_time - current_time).count();
+
+        current_time = new_time;
+
+        camera_controller.MoveInPlainXZ(window_.GetWindow(), frame_time, viewer_object);
+
+        camera.SetViewYXZ(viewer_object.transform.translation, viewer_object.transform.rotation);
 
         float aspect = render_.GetAspectRatio();
 
@@ -105,10 +121,6 @@ void App::LoadObjects()
     auto triangle = Object::CreateObject();
 
     triangle.model = model;
-
-    triangle.transform.translation = {0.f, 0.f, 2.5f};
-
-    triangle.transform.scale       = {.5f, .5f, .5f};
 
     objects_.push_back(std::move(triangle));
 }

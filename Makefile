@@ -8,8 +8,8 @@ vertObjFiles 	= 	$(patsubst %.vert, %.vert.spv, $(vertSources))
 fragSources 	= 	$(shell find ./shaders -type f -name "*.frag")
 fragObjFiles 	= 	$(patsubst %.frag, %.frag.spv, $(fragSources))
 
-app: main.cpp ./src/app.cpp ./src/window.cpp ./src/device.cpp ./src/model.cpp ./src/pipeline.cpp ./src/swap_chain.cpp ./src/render.cpp ./src/render_system.cpp ./src/camera.cpp
-	g++ $(CFLAGS) -o app main.cpp ./src/app.cpp ./src/window.cpp ./src/device.cpp ./src/model.cpp ./src/pipeline.cpp ./src/swap_chain.cpp  ./src/render.cpp ./src/render_system.cpp ./src/camera.cpp $(LDFLAGS)
+app: main.cpp ./src/app.cpp ./src/window.cpp ./src/device.cpp ./src/model.cpp ./src/pipeline.cpp ./src/swap_chain.cpp ./src/render.cpp ./src/render_system.cpp ./src/camera.cpp ./src/keyboard.cpp
+	g++ $(CFLAGS) -o app main.cpp ./src/app.cpp ./src/window.cpp ./src/device.cpp ./src/model.cpp ./src/pipeline.cpp ./src/swap_chain.cpp  ./src/render.cpp ./src/render_system.cpp ./src/camera.cpp ./src/keyboard.cpp $(LDFLAGS)
 
 .PHONY: test clean
 
