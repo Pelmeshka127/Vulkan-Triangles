@@ -7,9 +7,11 @@ namespace Vulkan
 
 //-------------------------------------------------------------------------------//
 
-Model::Model(Device &device, const std::vector<Vertex> &vertices) : Device_{device}
+Model::Model(Device &device, const Model::Builder& builder) : device_{device}
 {
-    CreateVertexBuffers(vertices);
+    CreateVertexBuffers(builder.vertices);
+
+    CreateIndexBuffers(builder.indices);
 }
 
 //-------------------------------------------------------------------------------//
@@ -22,7 +24,7 @@ void Model::CreateVertexBuffers(const std::vector<Vertex>& vertices)
 
     VkDeviceSize bufferSize = sizeof(vertices[0]) * vertexCount_;
 
-    Device_.createBuffer(
+    device_.createBuffer(
         bufferSize,
         VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
         VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
@@ -31,11 +33,40 @@ void Model::CreateVertexBuffers(const std::vector<Vertex>& vertices)
 
     void* data;
 
-    vkMapMemory(Device_.device(), vertexBufferMemory_, 0, bufferSize, 0, &data);
+    vkMapMemory(device_.device(), vertexBufferMemory_, 0, bufferSize, 0, &data);
 
     memcpy(data, vertices.data(), static_cast<size_t>(bufferSize));
   
-    vkUnmapMemory(Device_.device(), vertexBufferMemory_);
+    vkUnmapMemory(device_.device(), vertexBufferMemory_);
+}
+
+//-------------------------------------------------------------------------------//
+
+void Model::CreateIndexBuffers(const std::vector<uint32_t>& indices)
+{
+    indexCount_ = static_cast<uint32_t>(indices.size());
+
+    hasIndexBuffer = (indexCount_ > 0);
+
+    if (!hasIndexBuffer)
+        return;
+
+    VkDeviceSize bufferSize = sizeof(indices[0]) * indexCount_;
+
+    device_.createBuffer(
+        bufferSize,
+        VK_BUFFER_USAGE_INDEX_BUFFER_BIT,
+        VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
+        indexBuffer_,
+        indexBufferMemory_);
+
+    void* data;
+
+    vkMapMemory(device_.device(), indexBufferMemory_, 0, bufferSize, 0, &data);
+
+    memcpy(data, indices.data(), static_cast<size_t>(bufferSize));
+  
+    vkUnmapMemory(device_.device(), indexBufferMemory_);
 }
 
 //-------------------------------------------------------------------------------//
@@ -47,13 +78,20 @@ void Model::Bind(VkCommandBuffer commandBuffer)
     VkDeviceSize offsets[] = {0};
 
     vkCmdBindVertexBuffers(commandBuffer, 0, 1, buffers, offsets);
+
+    if (hasIndexBuffer)
+        vkCmdBindIndexBuffer(commandBuffer, indexBuffer_, 0, VK_INDEX_TYPE_UINT32);
 }
 
 //-------------------------------------------------------------------------------//
     
 void Model::Draw(VkCommandBuffer commandBuffer)
 {
-    vkCmdDraw(commandBuffer, vertexCount_, 1, 0, 0);
+    if (hasIndexBuffer)
+        vkCmdDrawIndexed(commandBuffer, indexCount_, 1, 0, 0, 0);
+
+    else
+        vkCmdDraw(commandBuffer, vertexCount_, 1, 0, 0);
 }
 
 //-------------------------------------------------------------------------------//
@@ -103,9 +141,16 @@ std::vector<VkVertexInputAttributeDescription> Model::Vertex::GetAttributeDescri
 
 Model::~Model()
 {
-    vkDestroyBuffer(Device_.device(), vertexBuffer_, nullptr);
+    vkDestroyBuffer(device_.device(), vertexBuffer_, nullptr);
 
-    vkFreeMemory(Device_.device(), vertexBufferMemory_, nullptr);
+    vkFreeMemory(device_.device(), vertexBufferMemory_, nullptr);
+
+    if (hasIndexBuffer)
+    {
+        vkDestroyBuffer(device_.device(), indexBuffer_, nullptr);
+
+        vkFreeMemory(device_.device(), indexBufferMemory_, nullptr);
+    }
 }
 
 //-------------------------------------------------------------------------------//

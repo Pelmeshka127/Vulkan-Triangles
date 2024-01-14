@@ -79,37 +79,41 @@ void App::RunApplication()
 
 std::unique_ptr<Model> App::CreateTriangleModel(Device &device, glm::vec3 offset)
 {
-    std::vector<Model::Vertex> vertices{
-
+    Model::Builder modelBuilder{};
+    modelBuilder.vertices = {
         {{-.5f, -.5f, -.5f}, {.9f, .9f, .9f}},
         {{-.5f, .5f, .5f}, {.9f, .9f, .9f}},
         {{-.5f, -.5f, .5f}, {.9f, .9f, .9f}},
-
+    
         {{.5f, -.5f, -.5f}, {.8f, .8f, .1f}},
         {{.5f, .5f, .5f}, {.8f, .8f, .1f}},
         {{.5f, -.5f, .5f}, {.8f, .8f, .1f}},
-
+    
         {{-.5f, -.5f, -.5f}, {.9f, .6f, .1f}},
         {{.5f, -.5f, .5f}, {.9f, .6f, .1f}},
         {{-.5f, -.5f, .5f}, {.9f, .6f, .1f}},
-
+    
         {{-.5f, .5f, -.5f}, {.8f, .1f, .1f}},
         {{.5f, .5f, .5f}, {.8f, .1f, .1f}},
         {{-.5f, .5f, .5f}, {.8f, .1f, .1f}},
-
+    
         {{-.5f, -.5f, 0.5f}, {.1f, .1f, .8f}},
         {{.5f, .5f, 0.5f}, {.1f, .1f, .8f}},
         {{-.5f, .5f, 0.5f}, {.1f, .1f, .8f}},
-
+    
         {{-.5f, -.5f, -0.5f}, {.1f, .8f, .1f}},
         {{.5f, .5f, -0.5f}, {.1f, .8f, .1f}},
         {{-.5f, .5f, -0.5f}, {.1f, .8f, .1f}},
     };
-
-    for (auto& v : vertices) {
+    for (auto& v : modelBuilder.vertices) {
         v.position += offset;
     }
-    return std::make_unique<Model>(device, vertices);
+    
+    for (uint32_t i = 0; i != 6 * 3; ++i) {
+        modelBuilder.indices.push_back(i);
+    }
+
+    return std::make_unique<Model>(device, modelBuilder);
 }
 
 //-------------------------------------------------------------------------------//
