@@ -18,9 +18,9 @@ namespace Vulkan
 
 //-------------------------------------------------------------------------------//
 
-App::App() 
+App::App(const Model::Builder& builder) 
 {
-    LoadObjects();
+    LoadObjects(builder);
 }
 //-------------------------------------------------------------------------------//
 
@@ -58,7 +58,7 @@ void App::RunApplication()
 
         camera.SetOrthographProjection(-aspect, aspect, -1, 1, -1, 1);
 
-        camera.SetPerspectiveProjection(glm::radians(50.f), aspect, 0.1f, 10.f);
+        camera.SetPerspectiveProjection(glm::radians(50.f), aspect, 0.1f, 1000.f);
         
         if (auto command_buffer = render_.BeginFrame())
         {
@@ -77,50 +77,55 @@ void App::RunApplication()
 
 //-------------------------------------------------------------------------------//
 
-std::unique_ptr<Model> App::CreateTriangleModel(Device &device, glm::vec3 offset)
+std::unique_ptr<Model> App::CreateTriangleModel(Device &device, glm::vec3 offset, const Model::Builder& builder)
 {
-    Model::Builder modelBuilder{};
-    modelBuilder.vertices = {
-        {{-.5f, -.5f, -.5f}, {.9f, .9f, .9f}},
-        {{-.5f, .5f, .5f}, {.9f, .9f, .9f}},
-        {{-.5f, -.5f, .5f}, {.9f, .9f, .9f}},
+    // builder.vertices = {
+    //     {{-.5f, -.5f, -.5f}, {.9f, .9f, .9f}},
+    //     {{-.5f, .5f, .5f}, {.9f, .9f, .9f}},
+    //     {{-.5f, -.5f, .5f}, {.9f, .9f, .9f}},
     
-        {{.5f, -.5f, -.5f}, {.8f, .8f, .1f}},
-        {{.5f, .5f, .5f}, {.8f, .8f, .1f}},
-        {{.5f, -.5f, .5f}, {.8f, .8f, .1f}},
+    //     {{.5f, -.5f, -.5f}, {.8f, .8f, .1f}},
+    //     {{.5f, .5f, .5f}, {.8f, .8f, .1f}},
+    //     {{.5f, -.5f, .5f}, {.8f, .8f, .1f}},
     
-        {{-.5f, -.5f, -.5f}, {.9f, .6f, .1f}},
-        {{.5f, -.5f, .5f}, {.9f, .6f, .1f}},
-        {{-.5f, -.5f, .5f}, {.9f, .6f, .1f}},
+    //     {{-.5f, -.5f, -.5f}, {.9f, .6f, .1f}},
+    //     {{.5f, -.5f, .5f}, {.9f, .6f, .1f}},
+    //     {{-.5f, -.5f, .5f}, {.9f, .6f, .1f}},
     
-        {{-.5f, .5f, -.5f}, {.8f, .1f, .1f}},
-        {{.5f, .5f, .5f}, {.8f, .1f, .1f}},
-        {{-.5f, .5f, .5f}, {.8f, .1f, .1f}},
+    //     {{-.5f, .5f, -.5f}, {.8f, .1f, .1f}},
+    //     {{.5f, .5f, .5f}, {.8f, .1f, .1f}},
+    //     {{-.5f, .5f, .5f}, {.8f, .1f, .1f}},
     
-        {{-.5f, -.5f, 0.5f}, {.1f, .1f, .8f}},
-        {{.5f, .5f, 0.5f}, {.1f, .1f, .8f}},
-        {{-.5f, .5f, 0.5f}, {.1f, .1f, .8f}},
+    //     {{-.5f, -.5f, 0.5f}, {.1f, .1f, .8f}},
+    //     {{.5f, .5f, 0.5f}, {.1f, .1f, .8f}},
+    //     {{-.5f, .5f, 0.5f}, {.1f, .1f, .8f}},
     
-        {{-.5f, -.5f, -0.5f}, {.1f, .8f, .1f}},
-        {{.5f, .5f, -0.5f}, {.1f, .8f, .1f}},
-        {{-.5f, .5f, -0.5f}, {.1f, .8f, .1f}},
-    };
-    for (auto& v : modelBuilder.vertices) {
-        v.position += offset;
-    }
-    
-    for (uint32_t i = 0; i != 6 * 3; ++i) {
-        modelBuilder.indices.push_back(i);
-    }
+    //     {{-.5f, -.5f, -0.5f}, {.1f, .8f, .1f}},
+    //     {{.5f, .5f, -0.5f}, {.1f, .8f, .1f}},
+    //     {{-.5f, .5f, -0.5f}, {.1f, .8f, .1f}},
 
-    return std::make_unique<Model>(device, modelBuilder);
+    //     {{0.25, 0.25, -0.5}, {.5f, .3f, .1f}},
+    //     {{0.5, 0, 1}, {.5f, .3f, .1f}},
+    //     {{1, 0, 0.5}, {.5f, .3f, .1f}},
+
+    //     // 0.25 0.25 -0.5 0.5 0 1 0 0.5
+    // };
+    // for (auto& v : builder.vertices) {
+    //     v.position += offset;
+    // }
+    
+    // for (uint32_t i = 0; i != 7 * 3; ++i) {
+    //     builder.indices.push_back(i);
+    // }
+
+    return std::make_unique<Model>(device, builder);
 }
 
 //-------------------------------------------------------------------------------//
 
-void App::LoadObjects() 
+void App::LoadObjects(const Model::Builder& builder) 
 {
-    std::shared_ptr<Model> model = CreateTriangleModel(device_, {0.f, 0.f, 0.f});
+    std::shared_ptr<Model> model = CreateTriangleModel(device_, {0.f, 0.f, 0.f}, builder);
 
     auto triangle = Object::CreateObject();
 

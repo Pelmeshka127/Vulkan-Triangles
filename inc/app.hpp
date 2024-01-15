@@ -22,7 +22,7 @@ class App
 
         static const int HEIGHT = 600;
 
-        App();
+        App(const Model::Builder& builder);
         
         ~App();
 
@@ -34,11 +34,11 @@ class App
 
     private:
     
-        void LoadObjects();
+        void LoadObjects(const Model::Builder& builder);
         
-        std::unique_ptr<Model> CreateTriangleModel(Device &device, glm::vec3 offset);
+        std::unique_ptr<Model> CreateTriangleModel(Device &device, glm::vec3 offset, const Model::Builder& builder);
         
-        Window                          window_{WIDTH, HEIGHT, "Hello Vulkan!"};
+        Window                          window_{WIDTH, HEIGHT, "Triangles"};
         
         Device                          device_{window_};
 
