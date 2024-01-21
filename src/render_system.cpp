@@ -12,10 +12,10 @@
 namespace Vulkan 
 {
 
-struct SimplePushConstantData { //
-    glm::mat4 transform{1.f}; //
-    alignas(16) glm::vec3 color; //
-}; //
+struct SimplePushConstantData { 
+    glm::mat4 transform{1.f}; 
+    glm::mat4 modelMatrix{1.f};
+}; 
 
 //-------------------------------------------------------------------------------//
 
@@ -90,8 +90,9 @@ void RenderSystem::RenderObjects(VkCommandBuffer CommandBuffer, std::vector<Obje
     {
 
         SimplePushConstantData push{};
-        push.color      = obj.color;
-        push.transform  = projection_view * obj.transform.mat4();
+        auto modelMatrix    = obj.transform.mat4();
+        push.transform      = projection_view * modelMatrix;
+        push.modelMatrix    = modelMatrix;
 
         vkCmdPushConstants(
             CommandBuffer,

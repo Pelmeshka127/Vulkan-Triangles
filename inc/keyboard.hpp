@@ -30,9 +30,9 @@ class Keyboard
 
     KeyMappings keys{};
 
-    float move_speed_{3.f};
+    float move_speed_{9.f};
 
-    float look_spped_{1.5f};
+    float look_spped_{3.f};
 
 };
 
