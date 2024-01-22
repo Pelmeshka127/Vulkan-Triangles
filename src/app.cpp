@@ -79,45 +79,6 @@ void App::RunApplication()
 
 std::unique_ptr<Model> App::CreateTriangleModel(Device &device, glm::vec3 offset, const Model::Builder& builder)
 {
-    // builder.vertices = {
-    //     {{-.5f, -.5f, -.5f}, {.9f, .9f, .9f}},
-    //     {{-.5f, .5f, .5f}, {.9f, .9f, .9f}},
-    //     {{-.5f, -.5f, .5f}, {.9f, .9f, .9f}},
-    
-    //     {{.5f, -.5f, -.5f}, {.8f, .8f, .1f}},
-    //     {{.5f, .5f, .5f}, {.8f, .8f, .1f}},
-    //     {{.5f, -.5f, .5f}, {.8f, .8f, .1f}},
-    
-    //     {{-.5f, -.5f, -.5f}, {.9f, .6f, .1f}},
-    //     {{.5f, -.5f, .5f}, {.9f, .6f, .1f}},
-    //     {{-.5f, -.5f, .5f}, {.9f, .6f, .1f}},
-    
-    //     {{-.5f, .5f, -.5f}, {.8f, .1f, .1f}},
-    //     {{.5f, .5f, .5f}, {.8f, .1f, .1f}},
-    //     {{-.5f, .5f, .5f}, {.8f, .1f, .1f}},
-    
-    //     {{-.5f, -.5f, 0.5f}, {.1f, .1f, .8f}},
-    //     {{.5f, .5f, 0.5f}, {.1f, .1f, .8f}},
-    //     {{-.5f, .5f, 0.5f}, {.1f, .1f, .8f}},
-    
-    //     {{-.5f, -.5f, -0.5f}, {.1f, .8f, .1f}},
-    //     {{.5f, .5f, -0.5f}, {.1f, .8f, .1f}},
-    //     {{-.5f, .5f, -0.5f}, {.1f, .8f, .1f}},
-
-    //     {{0.25, 0.25, -0.5}, {.5f, .3f, .1f}},
-    //     {{0.5, 0, 1}, {.5f, .3f, .1f}},
-    //     {{1, 0, 0.5}, {.5f, .3f, .1f}},
-
-    //     // 0.25 0.25 -0.5 0.5 0 1 0 0.5
-    // };
-    // for (auto& v : builder.vertices) {
-    //     v.position += offset;
-    // }
-    
-    // for (uint32_t i = 0; i != 7 * 3; ++i) {
-    //     builder.indices.push_back(i);
-    // }
-
     return std::make_unique<Model>(device, builder);
 }
 
