@@ -1,4 +1,4 @@
-#include <ctime>
+// #include <ctime>
 #include <vector>
 #include <fstream>
 #include <set>
@@ -7,6 +7,8 @@
 #include "octree.hpp"
 #include "coordinates.hpp"
 #include "intersection.hpp"
+#include "app.hpp"
+#include "model.hpp"
 
 //-------------------------------------------------------------------------------//
 
@@ -55,17 +57,45 @@ int main()
 
     bool *FlagArray = new bool [tr_numbers]{};
 
-    std::clock_t start = clock();
+    // std::clock_t start = clock();
 
     FindIntersectionsInNode(oct.root_, FlagArray);
 
-    for (size_t i = 0; i < tr_numbers; i++)
+    Vulkan::Model::Builder builder{};
+
+    glm::vec3 red_color     = {1.f, 0.f, 0.f};
+
+    glm::vec3 blue_color    = {0.f, 0.f, 1.f};
+
+    glm::vec3 color         = {0.f, 0.f, 0.f};
+
+    auto triangle = triangles.begin();
+
+    for (size_t i = 0; i < tr_numbers; i++, triangle++)
     {
         if (FlagArray[i])
+        {
+            color = red_color;
+
             std::cout << i << std::endl;
+        }
+
+        else
+            color = blue_color;
+
+        builder.vertices.push_back({Vulkan::GetGlmVector(triangle->P1()), color, Vulkan::GetNormal(*triangle)});
+
+        builder.vertices.push_back({Vulkan::GetGlmVector(triangle->P2()), color, Vulkan::GetNormal(*triangle)});
+
+        builder.vertices.push_back({Vulkan::GetGlmVector(triangle->P3()), color, Vulkan::GetNormal(*triangle)});
     }
 
-    std::cout << "Total time is " << (clock() - start) / (double) CLOCKS_PER_SEC << std::endl;
+    for (uint32_t i = 0; i < tr_numbers * 3; i++)
+        builder.indices.push_back(i);
+
+    Vulkan::App app{builder};
+
+    app.RunApplication();
 
     return 0;
 }

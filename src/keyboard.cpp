@@ -1,4 +1,4 @@
-#include "../inc/keyboard.hpp"
+#include "keyboard.hpp"
 
 namespace Vulkan
 {

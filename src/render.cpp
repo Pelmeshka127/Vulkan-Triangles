@@ -1,4 +1,4 @@
-#include "../inc/render.hpp"
+#include "render.hpp"
 
 #include <array>
 #include <stdexcept>

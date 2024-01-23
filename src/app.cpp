@@ -1,7 +1,7 @@
-#include "../inc/app.hpp"
-#include "../inc/render_system.hpp"
-#include "../inc/keyboard.hpp"
-#include "../inc/camera.hpp"
+#include "app.hpp"
+#include "render_system.hpp"
+#include "keyboard.hpp"
+#include "camera.hpp"
 
 #define GLM_FORCE_RADIANS
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
@@ -93,6 +93,38 @@ void App::LoadObjects(const Model::Builder& builder)
     triangle.model = model;
 
     objects_.push_back(std::move(triangle));
+}
+
+//-------------------------------------------------------------------------------//
+
+glm::vec3 GetNormal(const Triangle& triangle)
+{
+    glm::vec3 side1{}, side2{};
+
+    side1.x = triangle.P2().X() - triangle.P1().X();
+    side1.y = triangle.P2().Y() - triangle.P1().Y();
+    side1.z = triangle.P2().Z() - triangle.P1().Z();
+
+    side2.x = triangle.P3().X() - triangle.P1().X();
+    side2.y = triangle.P3().X() - triangle.P1().X();
+    side2.z = triangle.P3().X() - triangle.P1().X();
+
+    return glm::normalize(glm::cross(side1, side2));
+}
+
+//-------------------------------------------------------------------------------//
+
+glm::vec3 GetGlmVector(const Point& point)
+{
+    glm::vec3 vec{};
+
+    vec.x = point.X();
+
+    vec.y = point.Y();
+
+    vec.z = point.Z();
+
+    return vec;
 }
 
 //-------------------------------------------------------------------------------//

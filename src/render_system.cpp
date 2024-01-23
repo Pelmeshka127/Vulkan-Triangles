@@ -1,4 +1,4 @@
-#include "../inc/render_system.hpp"
+#include "render_system.hpp"
 
 #define GLM_FORCE_RADIANS
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
@@ -73,8 +73,8 @@ void RenderSystem::CreatePipeline(VkRenderPass render_pass)
     
     pipeline_ = std::make_unique<Pipeline>(
         device_,
-        "shaders/simple_shader.vert.spv",
-        "shaders/simple_shader.frag.spv",
+        "../shaders/shader.vert.spv",
+        "../shaders/shader.frag.spv",
         pipelineConfig);
 }
 

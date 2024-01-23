@@ -5,12 +5,22 @@
 #include "object.hpp"
 #include "window.hpp"
 #include "render.hpp"
+#include "point.hpp"
+#include "triangle.hpp"
 
 #include <memory>
 #include <vector>
 
 namespace Vulkan 
 {
+
+//-------------------------------------------------------------------------------//
+
+glm::vec3 GetGlmVector(const Point& point);
+
+//-------------------------------------------------------------------------------//
+
+glm::vec3 GetNormal(const Triangle& triangle);
 
 //-------------------------------------------------------------------------------//
 
