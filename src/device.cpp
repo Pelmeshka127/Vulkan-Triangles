@@ -10,7 +10,6 @@ namespace Vulkan
 
 //-------------------------------------------------------------------------------//
 
-// local callback functions
 static VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(
     VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity,
     VkDebugUtilsMessageTypeFlagsEXT messageType,
@@ -21,8 +20,6 @@ static VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(
 
     return VK_FALSE;
 }
-
-// std headers
 
 //-------------------------------------------------------------------------------//
 
@@ -209,8 +206,6 @@ void Device::createLogicalDevice()
     createInfo.enabledExtensionCount = static_cast<uint32_t>(deviceExtensions.size());
     createInfo.ppEnabledExtensionNames = deviceExtensions.data();
 
-    // might not really be necessary anymore because device specific validation layers
-    // have been deprecated
     if (enableValidationLayers) 
     {
         createInfo.enabledLayerCount = static_cast<uint32_t>(validationLayers.size());
@@ -630,8 +625,8 @@ void Device::copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize siz
     VkCommandBuffer commandBuffer = beginSingleTimeCommands();
 
     VkBufferCopy copyRegion{};
-    copyRegion.srcOffset = 0;  // Optional
-    copyRegion.dstOffset = 0;  // Optional
+    copyRegion.srcOffset = 0;
+    copyRegion.dstOffset = 0;
     copyRegion.size = size;
     
     vkCmdCopyBuffer(commandBuffer, srcBuffer, dstBuffer, 1, &copyRegion);

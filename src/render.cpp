@@ -38,8 +38,6 @@ void Render::RecreateSwapChain()
 
     vkDeviceWaitIdle(device_.device());
 
-    // swap_chain_ = nullptr; // important!
-
     if (swap_chain_ == nullptr)
         swap_chain_ = std::make_unique<SwapChain>(device_, extent);
 
@@ -48,11 +46,6 @@ void Render::RecreateSwapChain()
         std::shared_ptr<SwapChain> old_swap_chain = std::move(swap_chain_);
 
         swap_chain_ = std::make_unique<SwapChain>(device_, extent, old_swap_chain);
-
-        // if (old_swap_chain->compareSwapFormat(*swap_chain_.get()))
-        // {
-        //     throw std::runtime_error("Swap Chain image(or depth) format has changed!");
-        // }
         
         if (swap_chain_->ImageCount() != command_buffers_.size())
         {
