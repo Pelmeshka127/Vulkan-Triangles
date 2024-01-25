@@ -1,6 +1,7 @@
 #include "model.hpp"
 
 #include <cassert>
+#include <cstring>
 
 namespace Vulkan
 {
