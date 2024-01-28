@@ -73,8 +73,8 @@ void RenderSystem::CreatePipeline(VkRenderPass render_pass)
     
     pipeline_ = std::make_unique<Pipeline>(
         device_,
-        "../shaders/shader.vert.spv",
-        "../shaders/shader.frag.spv",
+        "vert.spv",
+        "frag.spv",
         pipelineConfig);
 }
 

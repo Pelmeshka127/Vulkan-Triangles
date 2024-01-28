@@ -1,6 +1,8 @@
 #ifndef DEVICE_HPP_
 #define DEVICE_HPP_
 
+#define NDEBUG
+
 #include "window.hpp"
 
 #include <string>
