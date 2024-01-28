@@ -2,12 +2,8 @@ cmake_minimum_required(VERSION 3.8)
 
 project(Unit LANGUAGES CXX)
 
-add_executable(unit unit.cpp  ../../src/geometry/point.cpp ../../src/geometry/plane.cpp ../../src/geometry/line.cpp ../../src/geometry/vector.cpp
-                            ../../src/geometry/triangle.cpp ../../src/geometry/octree.cpp ../../src/geometry/intersection.cpp
-                            ../../src/geometry/double_numbers.cpp)
-
-# add_executable(unit unit.cpp  ../../src/point.cpp ../../src/plane.cpp ../../src/line.cpp ../../src/vector.cpp
-#                             ../../src/triangle.cpp ../../src/octree.cpp ../../src/intersection.cpp
-#                             ../../src/double_numbers.cpp)
+add_executable(unit unit.cpp  ../../geometry/src/point.cpp ../../geometry/src/plane.cpp ../../geometry/src/line.cpp ../../geometry/src/vector.cpp
+                            ../../geometry/src/triangle.cpp ../../geometry/src/octree.cpp ../../geometry/src/intersection.cpp
+                            ../../geometry/src/double_numbers.cpp)
 
 target_link_libraries(unit PRIVATE ${GTEST_LIBRARIES})

@@ -6,15 +6,11 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 
-aux_source_directory(./src/geometry GEOMETRY)
+aux_source_directory(./geometry/src GEOMETRY)
 
-aux_source_directory(./src/vulkan VULKAN)
+aux_source_directory(./vulkan/src VULKAN)
 
-# aux_source_directory(./src SOURCES)
-
-add_executable(triangles ./src/main.cpp ${GEOMETRY} ${VULKAN})
-
-# add_executable(triangles ${SOURCES})
+add_executable(triangles main.cpp ${GEOMETRY} ${VULKAN})
 
 find_package(GTest REQUIRED)
 
@@ -50,12 +46,12 @@ target_link_libraries(triangles ${Vulkan_LIBRARIES}  Vulkan::Vulkan glfw)
 
 target_include_directories(triangles PRIVATE ${Vulkan_INCLUDE_DIRS})
 
-target_include_directories(triangles PRIVATE ${PROJECT_SOURCE_DIR}/inc/geometry)
+target_include_directories(triangles PRIVATE ${PROJECT_SOURCE_DIR}/geometry/inc)
 
-target_include_directories(triangles PRIVATE ${PROJECT_SOURCE_DIR}/inc/vulkan)
+target_include_directories(triangles PRIVATE ${PROJECT_SOURCE_DIR}/vulkan/inc)
 
 add_subdirectory(./tests)
 
-target_include_directories(ete PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/inc/geometry)
+target_include_directories(ete PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/geometry/inc)
 
-target_include_directories(unit PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/inc/geometry)
+target_include_directories(unit PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/geometry/inc)
