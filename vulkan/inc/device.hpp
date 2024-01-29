@@ -7,6 +7,7 @@
 
 #include <string>
 #include <vector>
+#include <array>
 
 namespace Vulkan 
 {
@@ -155,9 +156,9 @@ class Device {
         
         VkQueue         presentQueue_;
 
-        const std::vector<const char *> validationLayers = {"VK_LAYER_KHRONOS_validation"};
+        const std::array<const char *, 1> validationLayers = {"VK_LAYER_KHRONOS_validation"};
         
-        const std::vector<const char *> deviceExtensions = {VK_KHR_SWAPCHAIN_EXTENSION_NAME};
+        const std::array<const char *, 1> deviceExtensions = {VK_KHR_SWAPCHAIN_EXTENSION_NAME};
 };
 
 //-------------------------------------------------------------------------------//
