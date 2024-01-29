@@ -86,11 +86,11 @@ std::unique_ptr<Model> App::CreateTriangleModel(Device &device, glm::vec3 offset
 
 void App::LoadObjects(const Model::Builder& builder) 
 {
-    std::shared_ptr<Model> model = CreateTriangleModel(device_, {0.f, 0.f, 0.f}, builder);
+    std::unique_ptr<Model> model = CreateTriangleModel(device_, {0.f, 0.f, 0.f}, builder);
 
     auto triangle = Object::CreateObject();
 
-    triangle.model = model;
+    triangle.model = std::move(model);
 
     objects_.push_back(std::move(triangle));
 }

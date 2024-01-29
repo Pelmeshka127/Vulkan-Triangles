@@ -51,7 +51,7 @@ class Object
 
         id_t GetId() const { return id; }
 
-        std::shared_ptr<Model> model{};
+        std::unique_ptr<Model> model{};
         
         glm::vec3 color{};
         
