@@ -143,7 +143,7 @@ class Device {
         
         VkPhysicalDevice            physicalDevice = VK_NULL_HANDLE;
         
-        Window&                      window;
+        Window&                     window;
         
         VkCommandPool               commandPool;
 
