@@ -173,7 +173,7 @@ void Device::createLogicalDevice()
 
     std::vector<VkDeviceQueueCreateInfo> queueCreateInfos;
     
-    std::set<uint32_t> uniqueQueueFamilies = {indices.graphicsFamily, indices.presentFamily};
+    std::set<uint32_t> uniqueQueueFamilies = {indices.graphicsFamily.value(), indices.presentFamily.value()};
 
     float queuePriority = 1.0f;
     
@@ -212,9 +212,9 @@ void Device::createLogicalDevice()
     if (vkCreateDevice(physicalDevice, &createInfo, nullptr, &device_) != VK_SUCCESS) 
         throw std::runtime_error("failed to create logical device!");
 
-    vkGetDeviceQueue(device_, indices.graphicsFamily, 0, &graphicsQueue_);
+    vkGetDeviceQueue(device_, indices.graphicsFamily.value(), 0, &graphicsQueue_);
 
-    vkGetDeviceQueue(device_, indices.presentFamily, 0, &presentQueue_);
+    vkGetDeviceQueue(device_, indices.presentFamily.value(), 0, &presentQueue_);
 }
 
 //-------------------------------------------------------------------------------//
@@ -227,7 +227,7 @@ void Device::createCommandPool()
     
     poolInfo.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO;
     
-    poolInfo.queueFamilyIndex = queueFamilyIndices.graphicsFamily;
+    poolInfo.queueFamilyIndex = queueFamilyIndices.graphicsFamily.value();
     
     poolInfo.flags =
         VK_COMMAND_POOL_CREATE_TRANSIENT_BIT | VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT;
@@ -430,22 +430,14 @@ QueueFamilyIndices Device::findQueueFamilies(VkPhysicalDevice device)
     for (const auto &queueFamily : queueFamilies) 
     {
         if (queueFamily.queueCount > 0 && queueFamily.queueFlags & VK_QUEUE_GRAPHICS_BIT) 
-        {
             indices.graphicsFamily = i;
             
-            indices.graphicsFamilyHasValue = true;
-        }
-        
         VkBool32 presentSupport = false;
         
         vkGetPhysicalDeviceSurfaceSupportKHR(device, i, surface_, &presentSupport);
         
         if (queueFamily.queueCount > 0 && presentSupport) 
-        {
             indices.presentFamily = i;
-            
-            indices.presentFamilyHasValue = true;
-        }
         
         if (indices.isComplete()) 
             break;
