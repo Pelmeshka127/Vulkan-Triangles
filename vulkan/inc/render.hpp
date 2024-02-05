@@ -31,6 +31,12 @@ class Render
 
         float GetAspectRatio() const { return swap_chain_->ExtentAspectRatio(); }
 
+        int GetFrameIndex() const 
+        {
+            assert(isFrameStarted && "Cannot get frame index when frame not in progress");
+            return current_frame_index_;
+        }
+
         bool IsFrameInProgress() const { return is_frame_started_; }
 
         VkCommandBuffer GetCurrentCommandBuffer() const 
@@ -66,6 +72,8 @@ class Render
         std::vector<VkCommandBuffer>    command_buffers_;
 
         uint32_t                        current_image_index_;
+
+        int                             current_frame_index_ = 0;
 
         bool                            is_frame_started_ = false;
 };

@@ -2,6 +2,7 @@
 #define MODEL_HPP_
 
 #include "device.hpp"
+#include "uniform_buffer.hpp"
 
 #define GLM_FORCE_RADIANS
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
@@ -34,7 +35,7 @@ class Model
 
         Model(Device &device, const Model::Builder& builder);
         
-        ~Model();
+        ~Model() {};
 
         Model(const Model &) = delete;
         
@@ -52,14 +53,12 @@ class Model
 
         Device          &device_;
         
-        VkBuffer        vertexBuffer_;
-        VkDeviceMemory  vertexBufferMemory_;
+        std::unique_ptr<UniformBuffer> vertexBuffer_;
         uint32_t        vertexCount_;
 
         bool hasIndexBuffer = false;
 
-        VkBuffer        indexBuffer_;
-        VkDeviceMemory  indexBufferMemory_;
+        std::unique_ptr<UniformBuffer> indexBuffer_;
         uint32_t        indexCount_;
 };
 

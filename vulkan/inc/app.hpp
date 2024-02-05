@@ -5,6 +5,10 @@
 #include "object.hpp"
 #include "window.hpp"
 #include "render.hpp"
+#include "render_system.hpp"
+#include "keyboard.hpp"
+#include "camera.hpp"
+#include "uniform_buffer.hpp"
 #include "point.hpp"
 #include "triangle.hpp"
 

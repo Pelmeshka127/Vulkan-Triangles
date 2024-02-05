@@ -25,20 +25,28 @@ void Model::CreateVertexBuffers(const std::vector<Vertex>& vertices)
 
     VkDeviceSize bufferSize = sizeof(vertices[0]) * vertexCount_;
 
-    device_.createBuffer(
-        bufferSize,
+    uint32_t vertexSize = sizeof(vertices[0]);
+
+    UniformBuffer stagingBuffer {
+        device_, 
+        vertexSize, 
+        vertexCount_, 
         VK_BUFFER_USAGE_VERTEX_BUFFER_BIT,
         VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-        vertexBuffer_,
-        vertexBufferMemory_);
+    };
 
-    void* data;
+    stagingBuffer.map();
 
-    vkMapMemory(device_.device(), vertexBufferMemory_, 0, bufferSize, 0, &data);
+    stagingBuffer.writeToBuffer((void *)vertices.data());
 
-    memcpy(data, vertices.data(), static_cast<size_t>(bufferSize));
-  
-    vkUnmapMemory(device_.device(), vertexBufferMemory_);
+    vertexBuffer_ = std::make_unique<UniformBuffer>(
+        device_,
+        vertexSize,
+        vertexCount_,
+        VK_BUFFER_USAGE_VERTEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT,
+        VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
+
+    device_.copyBuffer(stagingBuffer.getBuffer(), vertexBuffer_->getBuffer(), bufferSize);
 }
 
 //-------------------------------------------------------------------------------//
@@ -46,42 +54,49 @@ void Model::CreateVertexBuffers(const std::vector<Vertex>& vertices)
 void Model::CreateIndexBuffers(const std::vector<uint32_t>& indices)
 {
     indexCount_ = static_cast<uint32_t>(indices.size());
-
-    hasIndexBuffer = (indexCount_ > 0);
+    
+    hasIndexBuffer = indexCount_ > 0;
 
     if (!hasIndexBuffer)
         return;
 
     VkDeviceSize bufferSize = sizeof(indices[0]) * indexCount_;
+    
+    uint32_t indexSize = sizeof(indices[0]);
 
-    device_.createBuffer(
-        bufferSize,
-        VK_BUFFER_USAGE_INDEX_BUFFER_BIT,
+    UniformBuffer stagingBuffer{
+        device_,
+        indexSize,
+        indexCount_,
+        VK_BUFFER_USAGE_TRANSFER_SRC_BIT,
         VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT,
-        indexBuffer_,
-        indexBufferMemory_);
+    };
 
-    void* data;
+    stagingBuffer.map();
+    stagingBuffer.writeToBuffer((void *)indices.data());
 
-    vkMapMemory(device_.device(), indexBufferMemory_, 0, bufferSize, 0, &data);
+    indexBuffer_ = std::make_unique<UniformBuffer>(
+        device_,
+        indexSize,
+        indexCount_,
+        VK_BUFFER_USAGE_INDEX_BUFFER_BIT | VK_BUFFER_USAGE_TRANSFER_DST_BIT,
+        VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
 
-    memcpy(data, indices.data(), static_cast<size_t>(bufferSize));
-  
-    vkUnmapMemory(device_.device(), indexBufferMemory_);
+    device_.copyBuffer(stagingBuffer.getBuffer(), indexBuffer_->getBuffer(), bufferSize);
 }
 
 //-------------------------------------------------------------------------------//
 
 void Model::Bind(VkCommandBuffer commandBuffer)
 {
-    VkBuffer buffers[] = {vertexBuffer_};
+    VkBuffer buffers[] = {vertexBuffer_->getBuffer()};
 
     VkDeviceSize offsets[] = {0};
 
     vkCmdBindVertexBuffers(commandBuffer, 0, 1, buffers, offsets);
 
     if (hasIndexBuffer)
-        vkCmdBindIndexBuffer(commandBuffer, indexBuffer_, 0, VK_INDEX_TYPE_UINT32);
+        vkCmdBindIndexBuffer(commandBuffer, indexBuffer_->getBuffer(), 0, VK_INDEX_TYPE_UINT32);
 }
 
 //-------------------------------------------------------------------------------//
@@ -145,22 +160,6 @@ std::vector<VkVertexInputAttributeDescription> Model::Vertex::GetAttributeDescri
     
     
     return attributeDescriptions;
-}
-
-//-------------------------------------------------------------------------------//
-
-Model::~Model()
-{
-    vkDestroyBuffer(device_.device(), vertexBuffer_, nullptr);
-
-    vkFreeMemory(device_.device(), vertexBufferMemory_, nullptr);
-
-    if (hasIndexBuffer)
-    {
-        vkDestroyBuffer(device_.device(), indexBuffer_, nullptr);
-
-        vkFreeMemory(device_.device(), indexBufferMemory_, nullptr);
-    }
 }
 
 //-------------------------------------------------------------------------------//

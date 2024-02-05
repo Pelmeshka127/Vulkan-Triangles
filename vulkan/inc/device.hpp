@@ -29,14 +29,6 @@ struct QueueFamilyIndices {
     std::optional<uint32_t> graphicsFamily;
 
     std::optional<uint32_t> presentFamily;
-
-    // uint32_t graphicsFamily;
-    
-    // uint32_t presentFamily;
-    
-    // bool graphicsFamilyHasValue = false;
-    
-    // bool presentFamilyHasValue  = false;
     
     bool isComplete() { return graphicsFamily.has_value() && presentFamily.has_value(); }
 };

@@ -1,7 +1,4 @@
 #include "app.hpp"
-#include "render_system.hpp"
-#include "keyboard.hpp"
-#include "camera.hpp"
 
 #define GLM_FORCE_RADIANS
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
@@ -15,6 +12,11 @@
 
 namespace Vulkan 
 {
+
+struct Ubo {
+    glm::mat4 projectionView{1.f};
+    glm::vec3 lightDirection = glm::normalize(glm::vec3{1.f, -3.f, -1.f});
+};
 
 //-------------------------------------------------------------------------------//
 
@@ -30,6 +32,17 @@ App::~App() {}
 
 void App::RunApplication() 
 {
+    UniformBuffer uniform_buffer {
+        device_,
+        sizeof(uniform_buffer),
+        SwapChain::MAX_FRAMES_IN_FLIGHT,
+        VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
+        VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT,
+        device_.properties.limits.minUniformBufferOffsetAlignment,
+    };
+
+    uniform_buffer.map();
+
     RenderSystem render_system{device_, render_.GetSwapChainRenderPass()};
     
     Camera camera{};
@@ -62,6 +75,18 @@ void App::RunApplication()
         
         if (auto command_buffer = render_.BeginFrame())
         {
+            int frameIndex = render_.GetFrameIndex();
+
+            
+            Ubo ubo{};
+
+            ubo.projectionView = camera.GetProjection() * camera.GetView();
+
+            uniform_buffer.writeToIndex(&ubo, frameIndex);
+
+            uniform_buffer.flushIndex(frameIndex);
+            
+
             render_.BeginSwapChainRenderPass(command_buffer);
 
             render_system.RenderObjects(command_buffer, objects_, camera);
