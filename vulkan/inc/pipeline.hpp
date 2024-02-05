@@ -68,14 +68,12 @@ class Pipeline
 
     private:
         
-        static std::vector<char> ReadFile(const std::string& filepath);
-
         void CreateGraphicsPipeline(
             const std::string& vertFilepath,
             const std::string& fragFilepath,
             const PipelineConfigInfo& configInfo);
 
-        void CreateShaderModule(const std::vector<char>& code, VkShaderModule* shaderModule);
+        void CreateShaderModule(const std::string& filePath, VkShaderModule* shaderModule);
 
         Device&         Device_;
         

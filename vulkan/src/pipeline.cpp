@@ -34,28 +34,6 @@ Pipeline::~Pipeline()
 
 //-------------------------------------------------------------------------------//
 
-std::vector<char> Pipeline::ReadFile(const std::string& filepath) 
-{
-    std::ifstream file{filepath, std::ios::ate | std::ios::binary};
-
-    if (!file.is_open()) 
-        throw std::runtime_error("failed to open file: " + filepath);
-
-    size_t fileSize = static_cast<size_t>(file.tellg());
-    
-    std::vector<char> buffer(fileSize);
-
-    file.seekg(0);
-    
-    file.read(buffer.data(), fileSize);
-
-    file.close();
-    
-    return buffer;
-}
-
-//-------------------------------------------------------------------------------//
-
 void Pipeline::CreateGraphicsPipeline(
     const std::string& vertFilepath,
     const std::string& fragFilepath,
@@ -68,11 +46,8 @@ void Pipeline::CreateGraphicsPipeline(
         configInfo.renderPass != VK_NULL_HANDLE &&
         "Cannot create graphics pipeline: no renderPass provided in configInfo");
 
-    auto vertCode = ReadFile(vertFilepath);
-    auto fragCode = ReadFile(fragFilepath);
-
-    CreateShaderModule(vertCode, &vertShaderModule_);
-    CreateShaderModule(fragCode, &fragShaderModule_);
+    CreateShaderModule(vertFilepath, &vertShaderModule_);
+    CreateShaderModule(fragFilepath, &fragShaderModule_);
 
     VkPipelineShaderStageCreateInfo shaderStages[2];
     shaderStages[0].sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
@@ -135,18 +110,39 @@ void Pipeline::CreateGraphicsPipeline(
 
 //-------------------------------------------------------------------------------//
 
-void Pipeline::CreateShaderModule(const std::vector<char>& code, VkShaderModule* shaderModule) 
+void Pipeline::CreateShaderModule(const std::string& filePath, VkShaderModule* shaderModule) 
 {
+    std::ifstream file{filePath, std::ios::ate | std::ios::binary};
+
+    if (!file.is_open()) 
+        throw std::runtime_error("failed to open file: " + filePath);
+
+    size_t fileSize = static_cast<size_t>(file.tellg());
+    
+    char* buffer = new char[fileSize];
+
+    file.seekg(0);
+    
+    file.read(buffer, fileSize);
+
+    file.close();
+
     VkShaderModuleCreateInfo createInfo{};
     
     createInfo.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO;
     
-    createInfo.codeSize = code.size();
+    createInfo.codeSize = fileSize;
     
-    createInfo.pCode = reinterpret_cast<const uint32_t*>(code.data());
+    createInfo.pCode = (uint32_t*) buffer;
 
     if (vkCreateShaderModule(Device_.device(), &createInfo, nullptr, shaderModule) != VK_SUCCESS) 
+    {
+        delete [] buffer;
+        
         throw std::runtime_error("failed to create shader module");
+    }
+
+    delete [] buffer;
 }
 
 //-------------------------------------------------------------------------------//
