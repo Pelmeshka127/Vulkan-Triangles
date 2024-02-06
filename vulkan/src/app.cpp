@@ -76,23 +76,16 @@ void App::RunApplication()
         if (auto command_buffer = render_.BeginFrame())
         {
             int frameIndex = render_.GetFrameIndex();
-
+            FrameInfo frameInfo {frameIndex, frame_time, command_buffer, camera};
             
             Ubo ubo{};
-
             ubo.projectionView = camera.GetProjection() * camera.GetView();
-
             uniform_buffer.writeToIndex(&ubo, frameIndex);
-
             uniform_buffer.flushIndex(frameIndex);
-            
 
             render_.BeginSwapChainRenderPass(command_buffer);
-
-            render_system.RenderObjects(command_buffer, objects_, camera);
-
+            render_system.RenderObjects(objects_, frameInfo);
             render_.EndSwapChainRenderPass(command_buffer);
-
             render_.EndFrame();
         }
     }

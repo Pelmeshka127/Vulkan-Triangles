@@ -14,6 +14,15 @@ namespace Vulkan
 
 //-------------------------------------------------------------------------------//
 
+struct FrameInfo {
+    int             frameIndex;
+    float           frameTime;
+    VkCommandBuffer commandBuffer;
+    Camera&         camera;
+};
+
+//-------------------------------------------------------------------------------//
+
 class RenderSystem 
 {
     public:
@@ -27,7 +36,7 @@ class RenderSystem
         RenderSystem &operator=(const RenderSystem &) = delete;
 
         
-        void RenderObjects(VkCommandBuffer CommandBuffer, std::vector<Object>& objects, const Camera& camera);
+        void RenderObjects(std::vector<Object>& objects, FrameInfo& frameInfo);
 
     private:
     

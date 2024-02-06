@@ -80,11 +80,11 @@ void RenderSystem::CreatePipeline(VkRenderPass render_pass)
 
 //-------------------------------------------------------------------------------//
 
-void RenderSystem::RenderObjects(VkCommandBuffer CommandBuffer, std::vector<Object>& objects, const Camera& camera)
+void RenderSystem::RenderObjects(std::vector<Object>& objects, FrameInfo& frameInfo)
 {
-    pipeline_->Bind(CommandBuffer);
+    pipeline_->Bind(frameInfo.commandBuffer);
 
-    auto projection_view = camera.GetProjection() * camera.GetView();
+    auto projection_view = frameInfo.camera.GetProjection() * frameInfo.camera.GetView();
 
     for (auto& obj : objects) 
     {
@@ -95,15 +95,15 @@ void RenderSystem::RenderObjects(VkCommandBuffer CommandBuffer, std::vector<Obje
         push.modelMatrix    = modelMatrix;
 
         vkCmdPushConstants(
-            CommandBuffer,
+            frameInfo.commandBuffer,
             pipeline_layout_,
             VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT,
             0,
             sizeof(SimplePushConstantData),
             &push);
 
-        obj.model->Bind(CommandBuffer);
-        obj.model->Draw(CommandBuffer);
+        obj.model->Bind(frameInfo.commandBuffer);
+        obj.model->Draw(frameInfo.commandBuffer);
     }
 }
 
