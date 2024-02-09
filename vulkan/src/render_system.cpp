@@ -13,15 +13,16 @@ namespace Vulkan
 {
 
 struct SimplePushConstantData { 
-    glm::mat4 transform{1.f}; 
     glm::mat4 modelMatrix{1.f};
+    glm::mat4 normalMatrix{1.f}; 
 }; 
 
 //-------------------------------------------------------------------------------//
 
-RenderSystem::RenderSystem(Device& device, VkRenderPass render_pass) : device_{device}
+RenderSystem::RenderSystem(Device& device, VkRenderPass render_pass, VkDescriptorSetLayout descriptorSetLayout) 
+    : device_{device}
 {
-    CreatePipelineLayout();
+    CreatePipelineLayout(descriptorSetLayout);
 
     CreatePipeline(render_pass);
 }
@@ -34,18 +35,19 @@ RenderSystem::~RenderSystem()
 
 //-------------------------------------------------------------------------------//
 
-void RenderSystem::CreatePipelineLayout() 
+void RenderSystem::CreatePipelineLayout(VkDescriptorSetLayout descriptorSetLayout) 
 { 
     VkPushConstantRange pushConstantRange{}; 
     pushConstantRange.stageFlags = VK_SHADER_STAGE_VERTEX_BIT | VK_SHADER_STAGE_FRAGMENT_BIT; 
     pushConstantRange.offset = 0; 
     pushConstantRange.size = sizeof(SimplePushConstantData);
 
+    std::vector<VkDescriptorSetLayout> descriptorSetLayouts{descriptorSetLayout};
+
     VkPipelineLayoutCreateInfo pipelineLayoutInfo{};
-    
     pipelineLayoutInfo.sType                    = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO;
-    pipelineLayoutInfo.setLayoutCount           = 0;
-    pipelineLayoutInfo.pSetLayouts              = nullptr;
+    pipelineLayoutInfo.setLayoutCount           = static_cast<uint32_t>(descriptorSetLayouts.size());
+    pipelineLayoutInfo.pSetLayouts              = descriptorSetLayouts.data();
     pipelineLayoutInfo.pushConstantRangeCount   = 1;
     pipelineLayoutInfo.pPushConstantRanges      = &pushConstantRange;
     
@@ -84,15 +86,22 @@ void RenderSystem::RenderObjects(std::vector<Object>& objects, FrameInfo& frameI
 {
     pipeline_->Bind(frameInfo.commandBuffer);
 
-    auto projection_view = frameInfo.camera.GetProjection() * frameInfo.camera.GetView();
+    vkCmdBindDescriptorSets(
+        frameInfo.commandBuffer,
+        VK_PIPELINE_BIND_POINT_GRAPHICS,
+        pipeline_layout_,
+        0,
+        1,
+        &frameInfo.descriptorSet,
+        0,
+        nullptr
+    );
 
     for (auto& obj : objects) 
     {
-
         SimplePushConstantData push{};
-        auto modelMatrix    = obj.transform.mat4();
-        push.transform      = projection_view * modelMatrix;
-        push.modelMatrix    = modelMatrix;
+        push.modelMatrix    = obj.transform.mat4();
+        push.normalMatrix   = obj.transform.normalMatrix();
 
         vkCmdPushConstants(
             frameInfo.commandBuffer,

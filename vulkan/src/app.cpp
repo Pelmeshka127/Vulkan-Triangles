@@ -67,7 +67,7 @@ void App::RunApplication()
             .build(globalDescriptorSets[i]);
     }
 
-    RenderSystem render_system{device_, render_.GetSwapChainRenderPass()};
+    RenderSystem render_system{device_, render_.GetSwapChainRenderPass(), globalSetLayout->getDescriptorSetLayout()};
     
     Camera camera{};
 
@@ -100,7 +100,7 @@ void App::RunApplication()
         if (auto command_buffer = render_.BeginFrame())
         {
             int frameIndex = render_.GetFrameIndex();
-            FrameInfo frameInfo {frameIndex, frame_time, command_buffer, camera};
+            FrameInfo frameInfo {frameIndex, frame_time, command_buffer, camera, globalDescriptorSets[frameIndex]};
             
             Ubo ubo{};
             ubo.projectionView = camera.GetProjection() * camera.GetView();

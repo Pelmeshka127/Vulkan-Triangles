@@ -19,6 +19,7 @@ struct FrameInfo {
     float           frameTime;
     VkCommandBuffer commandBuffer;
     Camera&         camera;
+    VkDescriptorSet descriptorSet;
 };
 
 //-------------------------------------------------------------------------------//
@@ -27,7 +28,7 @@ class RenderSystem
 {
     public:
     
-        RenderSystem(Device& device, VkRenderPass render_pass);
+        RenderSystem(Device& device, VkRenderPass render_pass, VkDescriptorSetLayout descriptorSetLayout);
         
         ~RenderSystem();
 
@@ -40,7 +41,7 @@ class RenderSystem
 
     private:
     
-        void CreatePipelineLayout();
+        void CreatePipelineLayout(VkDescriptorSetLayout descriptorSetLayout);
         
         void CreatePipeline(VkRenderPass render_pass);
 
