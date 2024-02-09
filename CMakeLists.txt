@@ -42,7 +42,7 @@ add_custom_target(shaders ALL DEPENDS vert frag)
 
 include_directories(${Vulkan_INCLUDE_DIRS})
 
-target_link_libraries(triangles ${Vulkan_LIBRARIES}  Vulkan::Vulkan glfw)
+target_link_libraries(triangles glfw ${Vulkan_LIBRARIES})
 
 target_include_directories(triangles PRIVATE ${Vulkan_INCLUDE_DIRS})
 
