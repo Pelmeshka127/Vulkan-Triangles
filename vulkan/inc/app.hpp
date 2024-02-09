@@ -9,6 +9,7 @@
 #include "keyboard.hpp"
 #include "camera.hpp"
 #include "uniform_buffer.hpp"
+#include "descriptor.hpp"
 #include "point.hpp"
 #include "triangle.hpp"
 
@@ -57,6 +58,8 @@ class App
         Device                          device_{window_};
 
         Render                          render_{window_, device_};
+
+        std::unique_ptr<DescriptorPool> globalPool_{};
         
         std::vector<Object>             objects_;
 };

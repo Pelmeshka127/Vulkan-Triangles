@@ -1,0 +1,14 @@
+{
+    "files.associations": {
+        "unordered_map": "cpp",
+        "__bit_reference": "cpp",
+        "bitset": "cpp",
+        "chrono": "cpp",
+        "map": "cpp",
+        "set": "cpp",
+        "unordered_set": "cpp",
+        "algorithm": "cpp",
+        "vector": "cpp",
+        "stdexcept": "cpp"
+    }
+}

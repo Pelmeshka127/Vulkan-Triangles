@@ -22,8 +22,14 @@ struct Ubo {
 
 App::App(const Model::Builder& builder) 
 {
+    globalPool_ = DescriptorPool::Builder(device_)
+        .setMaxSets(SwapChain::MAX_FRAMES_IN_FLIGHT)
+        .addPoolSize(VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, SwapChain::MAX_FRAMES_IN_FLIGHT)
+        .build();
+
     LoadObjects(builder);
 }
+
 //-------------------------------------------------------------------------------//
 
 App::~App() {}
@@ -32,16 +38,34 @@ App::~App() {}
 
 void App::RunApplication() 
 {
-    UniformBuffer uniform_buffer {
-        device_,
-        sizeof(uniform_buffer),
-        SwapChain::MAX_FRAMES_IN_FLIGHT,
-        VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
-        VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT,
-        device_.properties.limits.minUniformBufferOffsetAlignment,
-    };
+    std::vector<std::unique_ptr<UniformBuffer>> uboBuffers(SwapChain::MAX_FRAMES_IN_FLIGHT);
+    
+    for (int i = 0; i < uboBuffers.size(); i++) 
+    {
+        uboBuffers[i] = std::make_unique<UniformBuffer>(
+            device_,
+            sizeof(Ubo),
+            1,
+            VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT,
+            VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT);
+        
+        uboBuffers[i]->map();
+    }
 
-    uniform_buffer.map();
+    auto globalSetLayout = DescriptorSetLayout::Builder(device_)
+        .addBinding(0, VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, VK_SHADER_STAGE_VERTEX_BIT)
+        .build();
+    
+    std::vector<VkDescriptorSet> globalDescriptorSets(SwapChain::MAX_FRAMES_IN_FLIGHT);
+  
+    for (int i = 0; i < globalDescriptorSets.size(); i++) 
+    {
+        auto bufferInfo = uboBuffers[i]->descriptorInfo();
+        
+        DescriptorWriter(*globalSetLayout, *globalPool_)
+            .writeBuffer(0, &bufferInfo)
+            .build(globalDescriptorSets[i]);
+    }
 
     RenderSystem render_system{device_, render_.GetSwapChainRenderPass()};
     
@@ -80,8 +104,8 @@ void App::RunApplication()
             
             Ubo ubo{};
             ubo.projectionView = camera.GetProjection() * camera.GetView();
-            uniform_buffer.writeToIndex(&ubo, frameIndex);
-            uniform_buffer.flushIndex(frameIndex);
+            uboBuffers[frameIndex]->writeToBuffer(&ubo);
+            uboBuffers[frameIndex]->flush();
 
             render_.BeginSwapChainRenderPass(command_buffer);
             render_system.RenderObjects(objects_, frameInfo);
