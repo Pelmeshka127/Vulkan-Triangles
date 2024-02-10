@@ -15,12 +15,16 @@ namespace Vulkan
 
 struct Ubo {
     glm::mat4 projectionView{1.f};
-    glm::vec3 lightDirection = glm::normalize(glm::vec3{1.f, -3.f, -1.f});
+    glm::vec4 ambientLight{1.f, 1.f, 1.f, .2f};
+    glm::vec3 lightPosition{0.f};
+    alignas(16) glm::vec4 lightColor{1.f};
+    int size = 0;
 };
 
 //-------------------------------------------------------------------------------//
 
-App::App(const Model::Builder& builder) 
+App::App(const Model::Builder& builder, const std::pair<Point, float> lightParametres)
+    : lightParametres_{lightParametres}
 {
     globalPool_ = DescriptorPool::Builder(device_)
         .setMaxSets(SwapChain::MAX_FRAMES_IN_FLIGHT)
@@ -95,7 +99,7 @@ void App::RunApplication()
 
         camera.SetOrthographProjection(-aspect, aspect, -1, 1, -1, 1);
 
-        camera.SetPerspectiveProjection(glm::radians(50.f), aspect, 0.1f, 1000.f);
+        camera.SetPerspectiveProjection(glm::radians(50.f), aspect, 0.1f, 10000.f);
         
         if (auto command_buffer = render_.BeginFrame())
         {
@@ -103,6 +107,8 @@ void App::RunApplication()
             FrameInfo frameInfo {frameIndex, frame_time, command_buffer, camera, globalDescriptorSets[frameIndex]};
             
             Ubo ubo{};
+            ubo.lightPosition = {lightParametres_.first.X(), lightParametres_.first.Y(), lightParametres_.first.Z()};
+            ubo.size = lightParametres_.second * lightParametres_.second;
             ubo.projectionView = camera.GetProjection() * camera.GetView();
             uboBuffers[frameIndex]->writeToBuffer(&ubo);
             uboBuffers[frameIndex]->flush();

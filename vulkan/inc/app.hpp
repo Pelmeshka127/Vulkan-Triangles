@@ -37,7 +37,7 @@ class App
 
         static const int HEIGHT = 600;
 
-        App(const Model::Builder& builder);
+        App(const Model::Builder& builder, const std::pair<Point, float> lightParametres);
         
         ~App();
 
@@ -50,6 +50,8 @@ class App
     private:
     
         void LoadObjects(const Model::Builder& builder);
+
+        std::pair<Point, float> lightParametres_;
         
         std::unique_ptr<Model> CreateTriangleModel(Device &device, glm::vec3 offset, const Model::Builder& builder);
         

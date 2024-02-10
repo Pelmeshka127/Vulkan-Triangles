@@ -22,6 +22,8 @@ int main()
 
     double BoundingBoxX = 0, BoundingBoxY = 0, BoundingBoxZ = 0;
 
+    double minBoxX = 0, minBoxY = 0, minBoxZ = 0;
+
     for (int i = 0; i < tr_numbers; i++)
     {
         double p1x = 0, p1y = 0, p1z = 0, p2x = 0, p2y = 0, p2z = 0, p3x = 0, p3y = 0, p3z = 0;
@@ -49,9 +51,20 @@ int main()
 
         if (BoundingBoxZ < p1.MaxCoordinate(p1, p2, cords::Z))
             BoundingBoxZ = p1.MaxCoordinate(p1, p2, cords::Z);
+
+        if (minBoxX > p1.MinCoordinate(p2, p3, cords::X))
+            minBoxX = p1.MinCoordinate(p2, p3, cords::X);
+
+        if (minBoxY > p1.MinCoordinate(p2, p3, cords::Y))
+            minBoxY = p1.MinCoordinate(p2, p3, cords::Y);
+
+        if (minBoxZ > p1.MinCoordinate(p1, p2, cords::Z))
+            minBoxZ = p1.MaxCoordinate(p1, p2, cords::Z);
     }
 
     Point bounding_box(BoundingBoxX, BoundingBoxY, BoundingBoxZ);
+
+    Point minBox(minBoxX, minBoxY, minBoxZ);
 
     OctreeNew oct(triangles, bounding_box);
 
@@ -93,7 +106,13 @@ int main()
     for (uint32_t i = 0; i < tr_numbers * 3; i++)
         builder.indices.push_back(i);
 
-    Vulkan::App app{builder};
+    Point middle((bounding_box.X() + minBox.X()) / 2, (bounding_box.Y() + minBox.Y()) / 2, (bounding_box.Z() + minBox.Z()) / 2);
+
+    float maxRadius = std::abs(std::max(bounding_box.X(), std::max(bounding_box.Y(), bounding_box.Z())));
+
+    std::pair<Point, float> lightParametres{middle, maxRadius};
+
+    Vulkan::App app{builder, lightParametres};
 
     app.RunApplication();
 
