@@ -21,6 +21,13 @@ struct Ubo {
     int size = 0;
 };
 
+struct NewUbo {
+    alignas(16) glm::mat4 model;
+    alignas(16) glm::mat4 view;
+    alignas(16) glm::mat4 proj;
+    alignas(16) glm::vec3 view_pos;
+};
+
 //-------------------------------------------------------------------------------//
 
 App::App(const Model::Builder& builder, const std::pair<Point, float> lightParametres)
@@ -93,6 +100,10 @@ void App::RunApplication()
 
         camera_controller.MoveInPlainXZ(window_.GetWindow(), frame_time, viewer_object);
 
+        // camera_controller.OnUpdate(window_.GetWindow(), frame_time, viewer_object);
+
+        std::cout << camera.GetPosition().x << std::endl;
+
         camera.SetViewYXZ(viewer_object.transform.translation, viewer_object.transform.rotation);
 
         float aspect = render_.GetAspectRatio();
@@ -104,14 +115,24 @@ void App::RunApplication()
         if (auto command_buffer = render_.BeginFrame())
         {
             int frameIndex = render_.GetFrameIndex();
+            
             FrameInfo frameInfo {frameIndex, frame_time, command_buffer, camera, globalDescriptorSets[frameIndex]};
             
             Ubo ubo{};
             ubo.lightPosition = {lightParametres_.first.X(), lightParametres_.first.Y(), lightParametres_.first.Z()};
             ubo.size = lightParametres_.second * lightParametres_.second;
-            ubo.projectionView = camera.GetProjection() * camera.GetView();
+            ubo.projectionView = camera.GetProjectionMatrix() * camera.GetViewMatrix();
             uboBuffers[frameIndex]->writeToBuffer(&ubo);
             uboBuffers[frameIndex]->flush();
+
+            // NewUbo newubo{};
+            // newubo.view_pos = camera.GetPosition();
+            // newubo.view = camera.GetViewMatrix();
+            // newubo.proj = camera.GetProjectionMatrix();
+            // newubo.model =glm::mat4(1.0f);
+            // newubo.proj[1][1] *= -1;
+            // uboBuffers[frameIndex]->writeToBuffer(&newubo);
+            // uboBuffers[frameIndex]->flush();
 
             render_.BeginSwapChainRenderPass(command_buffer);
             render_system.RenderObjects(objects_, frameInfo);

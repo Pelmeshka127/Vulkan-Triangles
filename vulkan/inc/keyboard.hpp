@@ -3,6 +3,7 @@
 
 #include "object.hpp"
 #include "window.hpp"
+#include "camera.hpp"
 
 namespace Vulkan
 {
@@ -26,13 +27,18 @@ class Keyboard
         int LookDown        = GLFW_KEY_DOWN;
     };  
 
-    void MoveInPlainXZ(GLFWwindow* windo, float dt, Object& object);
+    void OnUpdate(GLFWwindow* window, float dt, Object& object);
+
+    void MoveInPlainXZ(GLFWwindow* window, float dt, Object& object);
 
     KeyMappings keys{};
 
     float move_speed_{100.f};
 
     float look_spped_{3.f};
+
+    Camera camera;
+    // float delta = 0.05f;   
 
 };
 
