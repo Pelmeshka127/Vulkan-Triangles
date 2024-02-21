@@ -98,11 +98,9 @@ void App::RunApplication()
 
         current_time = new_time;
 
-        camera_controller.MoveInPlainXZ(window_.GetWindow(), frame_time, viewer_object);
+        camera_controller.MoveInPlainXZ(window_.GetWindow(), frame_time, viewer_object, camera);
 
-        // camera_controller.OnUpdate(window_.GetWindow(), frame_time, viewer_object);
-
-        std::cout << camera.GetPosition().x << std::endl;
+        std::cout << camera.GetPosition().x << " " << camera.GetPosition().y << " " << camera.GetPosition().z << std::endl;
 
         camera.SetViewYXZ(viewer_object.transform.translation, viewer_object.transform.rotation);
 
@@ -119,15 +117,15 @@ void App::RunApplication()
             FrameInfo frameInfo {frameIndex, frame_time, command_buffer, camera, globalDescriptorSets[frameIndex]};
             
             Ubo ubo{};
-            ubo.lightPosition = {lightParametres_.first.X(), lightParametres_.first.Y(), lightParametres_.first.Z()};
+            ubo.lightPosition = camera.GetPosition();
             ubo.size = lightParametres_.second * lightParametres_.second;
-            ubo.projectionView = camera.GetProjectionMatrix() * camera.GetViewMatrix();
+            ubo.projectionView = camera.GetProjectionMatrix() * camera.GetView();
             uboBuffers[frameIndex]->writeToBuffer(&ubo);
             uboBuffers[frameIndex]->flush();
 
             // NewUbo newubo{};
             // newubo.view_pos = camera.GetPosition();
-            // newubo.view = camera.GetViewMatrix();
+            // newubo.view = camera.GetView();
             // newubo.proj = camera.GetProjectionMatrix();
             // newubo.model =glm::mat4(1.0f);
             // newubo.proj[1][1] *= -1;
