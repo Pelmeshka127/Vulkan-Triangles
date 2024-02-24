@@ -37,9 +37,7 @@ void Window::InitWindow()
 void Window::CreateWindowSurface(VkInstance instance, VkSurfaceKHR *surface)
 {
     if (glfwCreateWindowSurface(instance, window_, nullptr, surface) != VK_SUCCESS)
-    {
         throw std::runtime_error("Failed create window\n");
-    }
 }
 
 //-------------------------------------------------------------------------------//

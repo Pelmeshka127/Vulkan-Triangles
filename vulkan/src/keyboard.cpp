@@ -48,6 +48,13 @@ void Keyboard::MoveInPlainXZ(GLFWwindow* window, float dt, Object& object, Camer
     
     if (glfwGetKey(window, keys.MoveDown)       == GLFW_PRESS)          MoveDir -= UpDir;
 
+    if (glfwGetKey(window, keys.SpeedUp)        == GLFW_PRESS)          move_speed_ += 1;
+
+    if (glfwGetKey(window, keys.SpeedDown)      == GLFW_PRESS)          move_speed_ -= 1;
+
+    if (move_speed_ <= 0)
+        move_speed_ = 0;
+
     if (glm::dot(MoveDir, MoveDir) > std::numeric_limits<float>::epsilon())
         object.transform.translation += move_speed_ * dt * glm::normalize(MoveDir);
 

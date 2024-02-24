@@ -14,11 +14,12 @@ namespace Vulkan
 {
 
 struct Ubo {
-    glm::mat4 projectionView{1.f};
-    glm::vec4 ambientLight{1.f, 1.f, 1.f, .2f};
-    glm::vec3 lightPosition{0.f};
-    alignas(16) glm::vec4 lightColor{1.f};
-    int size = 0;
+    alignas(16) glm::mat4 projectionView{1.f};
+    alignas(16) glm::mat4 model;
+    // glm::vec4 ambientLight{1.f, 1.f, 1.f, .2f};
+    alignas(16) glm::vec3 lightPosition{0.f};
+    // alignas(16) glm::vec4 lightColor{1.f};
+    // int size = 0;
 };
 
 struct NewUbo {
@@ -100,8 +101,6 @@ void App::RunApplication()
 
         camera_controller.MoveInPlainXZ(window_.GetWindow(), frame_time, viewer_object, camera);
 
-        std::cout << camera.GetPosition().x << " " << camera.GetPosition().y << " " << camera.GetPosition().z << std::endl;
-
         camera.SetViewYXZ(viewer_object.transform.translation, viewer_object.transform.rotation);
 
         float aspect = render_.GetAspectRatio();
@@ -118,19 +117,11 @@ void App::RunApplication()
             
             Ubo ubo{};
             ubo.lightPosition = camera.GetPosition();
-            ubo.size = lightParametres_.second * lightParametres_.second;
+            std::cout << ubo.lightPosition.x << " " << ubo.lightPosition.y << " " << ubo.lightPosition.z << std::endl;
+            ubo.model += glm::mat4{1.f};
             ubo.projectionView = camera.GetProjectionMatrix() * camera.GetView();
             uboBuffers[frameIndex]->writeToBuffer(&ubo);
             uboBuffers[frameIndex]->flush();
-
-            // NewUbo newubo{};
-            // newubo.view_pos = camera.GetPosition();
-            // newubo.view = camera.GetView();
-            // newubo.proj = camera.GetProjectionMatrix();
-            // newubo.model =glm::mat4(1.0f);
-            // newubo.proj[1][1] *= -1;
-            // uboBuffers[frameIndex]->writeToBuffer(&newubo);
-            // uboBuffers[frameIndex]->flush();
 
             render_.BeginSwapChainRenderPass(command_buffer);
             render_system.RenderObjects(objects_, frameInfo);

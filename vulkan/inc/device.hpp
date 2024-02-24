@@ -48,7 +48,6 @@ class Device {
         
         ~Device();
 
-    // Not copyable or movable
         Device(const Device &) = delete;
         
         Device& operator=(const Device &) = delete;
@@ -77,7 +76,6 @@ class Device {
         VkFormat findSupportedFormat(
             const std::vector<VkFormat> &candidates, VkImageTiling tiling, VkFormatFeatureFlags features);
 
-    // Buffer Helper Functions
         void createBuffer(
             VkDeviceSize size,
             VkBufferUsageFlags usage,
@@ -116,7 +114,6 @@ class Device {
         
         void createCommandPool();
 
-    // helper functions
         bool isDeviceSuitable(VkPhysicalDevice device);
         
         std::vector<const char *> getRequiredExtensions();

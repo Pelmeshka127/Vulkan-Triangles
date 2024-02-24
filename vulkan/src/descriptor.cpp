@@ -1,51 +1,36 @@
 #include "descriptor.hpp"
+#include "vulkan/vulkan.hpp"
 
 namespace Vulkan
 {
 
 //-------------------------------------------------------------------------------//
 
-DescriptorSetLayout::Builder& DescriptorSetLayout::Builder::addBinding(uint32_t binding, VkDescriptorType descriptorType, VkShaderStageFlags stageFlags, uint32_t count) 
-{
-    assert(bindings.count(binding) == 0 && "Binding already in use");
+DescriptorSetLayout::DescriptorSetLayout(Device & device) : device_(device) {
     
-    VkDescriptorSetLayoutBinding layoutBinding{};
-    
-    layoutBinding.binding = binding;
-    
-    layoutBinding.descriptorType = descriptorType;
-    
-    layoutBinding.descriptorCount = count;
-    
-    layoutBinding.stageFlags = stageFlags;
-    
-    bindings[binding] = layoutBinding;
-    
-    return *this;
-}
+    VkDescriptorSetLayoutBinding uboLayoutBinding{};
 
-//-------------------------------------------------------------------------------//
+    uboLayoutBinding.binding            = 0;
 
-DescriptorSetLayout::DescriptorSetLayout(Device& device, std::unordered_map<uint32_t, VkDescriptorSetLayoutBinding> bindings) : device{device}, bindings{bindings}
-{
-    std::vector<VkDescriptorSetLayoutBinding> setLayoutBindings{};
-    
-    for (auto kv : bindings) 
-        setLayoutBindings.push_back(kv.second);
-    
+    uboLayoutBinding.descriptorType     = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+
+    uboLayoutBinding.descriptorCount    = 1;
+
+    uboLayoutBinding.stageFlags         = VK_SHADER_STAGE_ALL_GRAPHICS;
+
     VkDescriptorSetLayoutCreateInfo descriptorSetLayoutInfo{};
     
-    descriptorSetLayoutInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
+    descriptorSetLayoutInfo.sType           = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
     
-    descriptorSetLayoutInfo.bindingCount = static_cast<uint32_t>(setLayoutBindings.size());
+    descriptorSetLayoutInfo.bindingCount    = 1;
     
-    descriptorSetLayoutInfo.pBindings = setLayoutBindings.data();
+    descriptorSetLayoutInfo.pBindings       = &uboLayoutBinding;
 
     if (vkCreateDescriptorSetLayout(
-            device.device(),
-            &descriptorSetLayoutInfo,
-            nullptr,
-            &descriptorSetLayout) != VK_SUCCESS) 
+        device.device(),
+        &descriptorSetLayoutInfo,
+        nullptr,
+        &descriptorSetLayout_) != VK_SUCCESS) 
     {
         throw std::runtime_error("failed to create descriptor set layout!");
     }
@@ -53,21 +38,32 @@ DescriptorSetLayout::DescriptorSetLayout(Device& device, std::unordered_map<uint
 
 //-------------------------------------------------------------------------------//
 
-DescriptorPool::DescriptorPool(Device &device, uint32_t maxSets, VkDescriptorPoolCreateFlags poolFlags, const std::vector<VkDescriptorPoolSize> &poolSizes) : device{device} 
+DescriptorSetLayout::~DescriptorSetLayout() 
 {
+    vkDestroyDescriptorSetLayout(device_.device(), descriptorSetLayout_, nullptr);
+}
+
+//-------------------------------------------------------------------------------//
+
+DescriptorPool::DescriptorPool(Device& device, SwapChain& swapChain) 
+    : device_(device), swapChain_(swapChain) 
+{
+    VkDescriptorPoolSize poolSize{
+        VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
+        static_cast<uint32_t>(swapChain_.MAX_FRAMES_IN_FLIGHT)
+    };
+
     VkDescriptorPoolCreateInfo descriptorPoolInfo{};
     
     descriptorPoolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
     
-    descriptorPoolInfo.poolSizeCount = static_cast<uint32_t>(poolSizes.size());
+    descriptorPoolInfo.maxSets = static_cast<uint32_t>(swapChain_.MAX_FRAMES_IN_FLIGHT);
     
-    descriptorPoolInfo.pPoolSizes = poolSizes.data();
+    descriptorPoolInfo.poolSizeCount = 1;
     
-    descriptorPoolInfo.maxSets = maxSets;
+    descriptorPoolInfo.pPoolSizes = &poolSize;
     
-    descriptorPoolInfo.flags = poolFlags;
-    
-    if (vkCreateDescriptorPool(device.device(), &descriptorPoolInfo, nullptr, &descriptorPool) !=
+    if (vkCreateDescriptorPool(device.device(), &descriptorPoolInfo, nullptr, &descriptorPool_) !=
         VK_SUCCESS) 
     {
         throw std::runtime_error("failed to create descriptor pool!");
@@ -76,100 +72,60 @@ DescriptorPool::DescriptorPool(Device &device, uint32_t maxSets, VkDescriptorPoo
 
 //-------------------------------------------------------------------------------//
 
-bool DescriptorPool::allocateDescriptor(const VkDescriptorSetLayout descriptorSetLayout, VkDescriptorSet &descriptor) const 
+DescriptorPool::~DescriptorPool() 
 {
-    VkDescriptorSetAllocateInfo allocInfo{};
-    
-    allocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
-    
-    allocInfo.descriptorPool = descriptorPool;
-    
-    allocInfo.pSetLayouts = &descriptorSetLayout;
-    
-    allocInfo.descriptorSetCount = 1;
-
-    if (vkAllocateDescriptorSets(device.device(), &allocInfo, &descriptor) != VK_SUCCESS) 
-        return false;
-    
-    return true;
+    vkDestroyDescriptorPool(device_.device(), descriptorPool_, nullptr);
 }
 
 //-------------------------------------------------------------------------------//
 
-DescriptorWriter& DescriptorWriter::writeBuffer(uint32_t binding, VkDescriptorBufferInfo *bufferInfo)
-{
-    assert(setLayout.bindings.count(binding) == 1 && "Layout does not contain specified binding");
-    
-    auto bindingDescription = setLayout.getBindings()[binding];
-    
-    assert(bindingDescription.descriptorCount == 1 && "Binding single descriptor info, but binding expects multiple");
-    
-    VkWriteDescriptorSet write{};
-    
-    write.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-    
-    write.descriptorType = bindingDescription.descriptorType;
-    
-    write.dstBinding = binding;
-    
-    write.pBufferInfo = bufferInfo;
-    
-    write.descriptorCount = 1;
-    
-    writes.push_back(write);
-    
-    return *this;
-}
 
-//-------------------------------------------------------------------------------//
+DescriptorSets::DescriptorSets(Device & device, SwapChain & swapChain, UniformBuffer & uniformBuffer, DescriptorSetLayout & descripterSetLayout, DescriptorPool & descripterPool) :
+    device_(device), swapChain_(swapChain), uniformBuffer_(uniformBuffer), descriptorSetLayout_(descripterSetLayout), descriptorPool_(descripterPool) {
+    
+    std::vector<VkDescriptorSetLayout> layouts(swapChain.MAX_FRAMES_IN_FLIGHT, descriptorSetLayout_.getDescriptorSetLayout_());
 
-DescriptorWriter& DescriptorWriter::writeImage(uint32_t binding, VkDescriptorImageInfo *imageInfo) 
-{
-    assert(setLayout.bindings.count(binding) == 1 && "Layout does not contain specified binding");
-    
-    auto bindingDescription = setLayout.getBindings()[binding];
-    
-    assert(bindingDescription.descriptorCount == 1 && "Binding single descriptor info, but binding expects multiple");
-    
-    VkWriteDescriptorSet write{};
-    
-    write.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-    
-    write.descriptorType = bindingDescription.descriptorType;
-    
-    write.dstBinding = binding;
-    
-    write.pImageInfo = imageInfo;
-    
-    write.descriptorCount = 1;
-    
-    writes.push_back(write);
+    VkDescriptorSetAllocateInfo allocInfo;
 
-    return *this;
-}
+    allocInfo.descriptorPool = descripterPool.getDescriptorPool();
 
-//-------------------------------------------------------------------------------//
+    allocInfo.descriptorSetCount = static_cast<uint32_t>(swapChain.MAX_FRAMES_IN_FLIGHT);
 
-bool DescriptorWriter::build(VkDescriptorSet &set) 
-{
-    bool success = pool.allocateDescriptor(setLayout.getDescriptorSetLayout(), set);
-    
-    if (!success) 
-        return false;
+    allocInfo.pSetLayouts = layouts.data();
 
-    overwrite(set);
+    descriptorSets_.resize(swapChain.MAX_FRAMES_IN_FLIGHT);
 
-    return true;
-}
+    if (vkAllocateDescriptorSets(device_.device(), &allocInfo, descriptorSets_.data()) != VK_SUCCESS)
+        throw std::runtime_error("failed to allocate descriptor sets!");
 
-//-------------------------------------------------------------------------------//
+    for (size_t i = 0; i < swapChain.MAX_FRAMES_IN_FLIGHT; i++) 
+    {
+        VkDescriptorBufferInfo bufferInfo{
+            uniformBuffer_.getUniformBuffers()[i],
+            0,
+            uniformBuffer_.getSizeOfUniformBufferObject()
+        };
 
-void DescriptorWriter::overwrite(VkDescriptorSet &set) 
-{
-    for (auto &write : writes) 
-        write.dstSet = set;
+        VkWriteDescriptorSet descriptorWrite;
 
-    vkUpdateDescriptorSets(pool.getDevice(), writes.size(), writes.data(), 0, nullptr);
+        descriptorWrite.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+
+        descriptorWrite.dstSet = descriptorSets_[i];
+
+        descriptorWrite.dstBinding = 0;
+
+        descriptorWrite.dstArrayElement = 0;
+
+        descriptorWrite.descriptorCount = 1;
+
+        descriptorWrite.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+
+        descriptorWrite.pImageInfo = {};
+
+        descriptorWrite.pBufferInfo = &bufferInfo;
+
+        vkUpdateDescriptorSets(device_.device(), 1, &descriptorWrite, 0, nullptr);
+    }
 }
 
 //-------------------------------------------------------------------------------//

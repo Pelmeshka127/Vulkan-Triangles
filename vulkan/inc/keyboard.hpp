@@ -25,6 +25,8 @@ class Keyboard
         int LookRight       = GLFW_KEY_RIGHT;
         int LookUp          = GLFW_KEY_UP;
         int LookDown        = GLFW_KEY_DOWN;
+        int SpeedUp         = GLFW_KEY_P;
+        int SpeedDown       = GLFW_KEY_O;
     };  
 
     void MoveInPlainXZ(GLFWwindow* window, float dt, Object& object, Camera& camera);

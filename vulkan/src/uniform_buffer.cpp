@@ -7,149 +7,62 @@ namespace Vulkan
 {
 
 //-------------------------------------------------------------------------------//
- 
-VkDeviceSize UniformBuffer::getAlignment(VkDeviceSize instanceSize, VkDeviceSize minOffsetAlignment) 
-{
-    if (minOffsetAlignment > 0) 
-        return (instanceSize + minOffsetAlignment - 1) & ~(minOffsetAlignment - 1);
 
-    return instanceSize;
+UniformBuffer::UniformBuffer(Device& device, SwapChain& swapChain, Camera& camera, Window& window) : 
+    device_(device), swapChain_(swapChain), camera_(camera), window_(window) 
+{
+    VkDeviceSize bufferSize = sizeof(UniformBufferObject);
+
+    uniformBuffers_.resize(swapChain.MAX_FRAMES_IN_FLIGHT);
+    
+    uniformBuffersMemory_.resize(swapChain.MAX_FRAMES_IN_FLIGHT);
+    
+    uniformBuffersMapped_.resize(swapChain.MAX_FRAMES_IN_FLIGHT);
+
+    for (size_t i = 0; i < swapChain.MAX_FRAMES_IN_FLIGHT; i++) 
+    {
+        device.createBuffer(bufferSize, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, uniformBuffers_[i], uniformBuffersMemory_[i]);
+
+        vkMapMemory(device_.device(), uniformBuffersMemory_[i], 0, bufferSize, 0, &uniformBuffersMapped_[i]);
+    }
+
 }
 
 //-------------------------------------------------------------------------------//
- 
-UniformBuffer::UniformBuffer(
-    Device &device,
-    VkDeviceSize instanceSize,
-    uint32_t instanceCount,
-    VkBufferUsageFlags usageFlags,
-    VkMemoryPropertyFlags memoryPropertyFlags,
-    VkDeviceSize minOffsetAlignment)
-    : device_{device},
-    instanceSize_{instanceSize},
-    instanceCount_{instanceCount},
-    usageFlags_{usageFlags},
-    memoryPropertyFlags_{memoryPropertyFlags} 
-{
-    alignmentSize_ = getAlignment(instanceSize, minOffsetAlignment);
-    
-    bufferSize_ = alignmentSize_ * instanceCount;
-    
-    device_.createBuffer(bufferSize_, usageFlags, memoryPropertyFlags, buffer_, memory_);
-}
 
-//-------------------------------------------------------------------------------//
- 
 UniformBuffer::~UniformBuffer() 
 {
-    unmap();
-    
-    vkDestroyBuffer(device_.device(), buffer_, nullptr);
-    
-    vkFreeMemory(device_.device(), memory_, nullptr);
-}
- 
-//-------------------------------------------------------------------------------//
+  for (size_t i = 0; i < swapChain_.MAX_FRAMES_IN_FLIGHT; i++) 
+  {
+        vkDestroyBuffer(device_.device(), uniformBuffers_[i], nullptr);
 
-VkResult UniformBuffer::map(VkDeviceSize size, VkDeviceSize offset)
-{
-    assert(buffer_ && memory_ && "Called map on buffer before create");
-    
-    return vkMapMemory(device_.device(), memory_, offset, size, 0, &mapped_);
-}
-
-//-------------------------------------------------------------------------------//
- 
-void UniformBuffer::unmap() 
-{
-    if (mapped_) 
-    {
-        vkUnmapMemory(device_.device(), memory_);
-    
-        mapped_ = nullptr;
+        vkFreeMemory(device_.device(), uniformBuffersMemory_[i], nullptr);
     }
 }
 
 //-------------------------------------------------------------------------------//
- 
-void UniformBuffer::writeToBuffer(void *data, VkDeviceSize size, VkDeviceSize offset) 
+
+void UniformBuffer::update(uint32_t currentImage) 
 {
-    assert(mapped && "Cannot copy to unmapped buffer");
-    
-    if (size == VK_WHOLE_SIZE) 
-        memcpy(mapped_, data, bufferSize_);
-    
-    else 
-    {
-        char *memOffset = (char *)mapped_;
-    
-        memOffset += offset;
-    
-        memcpy(memOffset, data, size);
-    }
-}
- 
-//-------------------------------------------------------------------------------//
 
-VkResult UniformBuffer::flush(VkDeviceSize size, VkDeviceSize offset) 
-{
-    VkMappedMemoryRange mappedRange = {};
-    mappedRange.sType = VK_STRUCTURE_TYPE_MAPPED_MEMORY_RANGE;
-    mappedRange.memory = memory_;
-    mappedRange.offset = offset;
-    mappedRange.size = size;
-    return vkFlushMappedMemoryRanges(device_.device(), 1, &mappedRange);
-}
+    static auto startTime = std::chrono::high_resolution_clock::now();
 
-//-------------------------------------------------------------------------------//
+    auto currentTime = std::chrono::high_resolution_clock::now();
+    float time = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
 
-VkResult UniformBuffer::invalidate(VkDeviceSize size, VkDeviceSize offset) 
-{
-    VkMappedMemoryRange mappedRange = {};
-    mappedRange.sType = VK_STRUCTURE_TYPE_MAPPED_MEMORY_RANGE;
-    mappedRange.memory = memory_;
-    mappedRange.offset = offset;
-    mappedRange.size = size;
-    return vkInvalidateMappedMemoryRanges(device_.device(), 1, &mappedRange);
-}
+    double x_prev, y_prev;
+    glfwGetCursorPos(window_.getGLFWwindow(), &x_prev, &y_prev);
+    camera_.viewer_position += camera_.determine_move();
+    camera_.camera_direction = camera_.determine_rotate(x_prev, y_prev);
 
-//-------------------------------------------------------------------------------//
+    UniformBuffer::UniformBufferObject ubo{};
+    ubo.model = glm::mat4(1.0f);
+    ubo.view = glm::lookAt(camera_.viewer_position, camera_.viewer_position + camera_.camera_direction, camera_.camera_up);
+    ubo.proj = glm::perspective(glm::radians(45.0f), swapChain_.getExtent().width / (float) swapChain_.getExtent().height, 0.1f, 1000.0f);
+    ubo.viewPos = camera_.viewer_position;
+    ubo.proj[1][1] *= -1;
 
-VkDescriptorBufferInfo UniformBuffer::descriptorInfo(VkDeviceSize size, VkDeviceSize offset) 
-{
-    return VkDescriptorBufferInfo{
-        buffer_,
-        offset,
-        size,
-    };
-}
- 
-//-------------------------------------------------------------------------------//
-
-void UniformBuffer::writeToIndex(void *data, int index) 
-{
-    writeToBuffer(data, instanceSize_, index * alignmentSize_);
-}
- 
-//-------------------------------------------------------------------------------//
-
-VkResult UniformBuffer::flushIndex(int index) 
-{
-    return flush(alignmentSize_, index * alignmentSize_); 
-}
- 
-//-------------------------------------------------------------------------------//
-
-VkDescriptorBufferInfo UniformBuffer::descriptorInfoForIndex(int index) 
-{
-    return descriptorInfo(alignmentSize_, index * alignmentSize_);
-}
- 
-//-------------------------------------------------------------------------------//
-
-VkResult UniformBuffer::invalidateIndex(int index) 
-{
-    return invalidate(alignmentSize_, index * alignmentSize_);
+    memcpy(uniformBuffersMapped_[currentImage], &ubo, sizeof(ubo));
 }
 
 //-------------------------------------------------------------------------------//
