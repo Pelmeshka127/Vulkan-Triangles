@@ -42,7 +42,7 @@ class UniformBuffer
         
         const std::vector<void*>& getUniformBeffersMapped() const { return uniformBuffersMapped_; }
 
-        void update(uint32_t currentImage);
+        void update(uint32_t currentImage, const glm::mat4& view, const glm::mat4& proj, const glm::vec3& camera_pos);
 
     private:
         

@@ -35,9 +35,9 @@ glm::vec3 GetNormal(const Triangle& triangle);
 const uint32_t WIDTH = 800;
 const uint32_t HEIGHT = 600;
 
-static double prev_x = 0.0;
-static double prev_y = 0.0;
-static bool lpress = false;
+// static double prev_x = 0.0;
+// static double prev_y = 0.0;
+// static bool lpress = false;
 
 class App 
 {
@@ -47,6 +47,8 @@ class App
 
         App(std::vector<Model::Vertex> vertices, std::vector<uint32_t> indices) : model(device, vertices, indices) {}
 
+        void on_update();
+        
     private:
         
         Camera camera{};
@@ -76,6 +78,10 @@ class App
         static void mouse_button_callback (GLFWwindow* window, int button, int action, int mods) noexcept;
         
         static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
+
+        double m_initial_mouse_pos_x = 0.0;
+        double m_initial_mouse_pos_y = 0.0;
+        float delta = 0.05f;    
 };
 
 //-------------------------------------------------------------------------------//
