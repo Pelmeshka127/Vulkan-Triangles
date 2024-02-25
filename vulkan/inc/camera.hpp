@@ -1,95 +1,47 @@
 #ifndef CAMERA_HPP_
 #define CAMERA_HPP_
-
+#include <iostream>
 #define GLM_FORCE_RADIANS
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#include <array>
 
 namespace Vulkan
 {
 
-//-------------------------------------------------------------------------------//
-
-class Camera
+class Camera 
 {
-    public:
-
-        void SetOrthographProjection(float left, float right, float top, float bottom, float near, float far)
-        {
-            projection_matrix_ = glm::ortho(left, right, top, bottom, near, far);
-        }
-
-        void SetPerspectiveProjection(float fovy, float aspect, float near, float far)
-        {
-            projection_matrix_ = glm::perspectiveLH_ZO(fovy, aspect, near, far);
-        }
-
-        void SetViewDirection(glm::vec3 position, glm::vec3 direction, glm::vec3 up = glm::vec3(0.f, -1.f, 0.f))
-        {
-            view_matrix_ = glm::lookAt(position, direction, up);
-        }
-
-        void SetViewTarget(glm::vec3 position, glm::vec3 target, glm::vec3 up = glm::vec3(0.f, -1.f, 0.f))
-        {
-            SetViewDirection(position, target - position, up);
-        }
-
-        void SetViewYXZ(glm::vec3 position, glm::vec3 rotation)
-        {
-            const float c3 = glm::cos(rotation.z);
-            const float s3 = glm::sin(rotation.z);
-            const float c2 = glm::cos(rotation.x);
-            const float s2 = glm::sin(rotation.x);
-            const float c1 = glm::cos(rotation.y);
-            const float s1 = glm::sin(rotation.y);
-            
-            const glm::vec3 u{(c1 * c3 + s1 * s2 * s3), (c2 * s3), (c1 * s2 * s3 - c3 * s1)};
-            const glm::vec3 v{(c3 * s1 * s2 - c1 * s3), (c2 * c3), (c1 * c3 * s2 + s1 * s3)};
-            const glm::vec3 w{(c2 * s1), (-s2), (c1 * c2)};
-            
-            view_matrix_ = glm::mat4{1.f};
-
-            view_matrix_ = glm::rotate(view_matrix_, rotation.y, v);
-            view_matrix_ = glm::rotate(view_matrix_, rotation.x, u);
-            view_matrix_ = glm::rotate(view_matrix_, rotation.z, w);
-            view_matrix_ = glm::transpose(view_matrix_);
-            view_matrix_ = glm::translate(view_matrix_, -position);
-        }
-
-        const glm::mat4& GetProjectionMatrix()  const { return projection_matrix_; }
-
-        const glm::mat4& GetView()              const { return view_matrix_; }
-    
-        const glm::vec3& GetPosition()          const { return position_; }
-        
-        const glm::vec3& GetRotation()          const { return rotation_; }
-
-        void UpdatePositionAndRotation(const glm::vec3 movement_delta, const glm::vec3 rotation_delta,
-                                    const glm::vec3 dir, const glm::vec3 right, const glm::vec3 up)
-        {
-            position_ += dir        * movement_delta.x;
-
-            position_ += right      * movement_delta.y;
-
-            position_ += up         * movement_delta.z;
-
-            rotation_ += rotation_delta;
-        }
-
     private:
+        float speed = 1;
 
-        glm::vec3 position_{0};
-        
-        glm::vec3 rotation_{0};
+        // glm::mat4 projectionMatrix{1.f};
+        // glm::mat4 viewMatrix{1.f};
+        // glm::mat4 inverseViewMatrix{1.f};
 
-        glm::mat4 view_matrix_;
-        
-        glm::mat4 projection_matrix_;
+    public:
+        double xpos;
+        double ypos;
+
+        glm::vec3 determine_move(/*const std::array<bool, NUMBER_OF_KEYBOARD_KEYS>& keyboard_keys*/);
+        glm::vec3 determine_rotate(/*const std::array<bool, NUMBER_OF_MOUSE_BUTTONS>& mouse_buttons,*/ double prev_x, double prev_y);
+
+        glm::vec3 viewer_position = glm::vec3(0.0f, 0.0f, 0.0f);
+        // glm::vec3 view_position =  glm::vec3(0.0f, 0.0f, 0.0f);
+        glm::vec3 camera_direction = glm::normalize (glm::vec3 {1.0f, 1.0f, 1.0f});
+        glm::vec3 camera_up = glm::vec3(0.0f, 0.0f, 1.0f);
+
+        // const glm::mat4& get_projection() const { return projectionMatrix; }
+        // const glm::mat4& get_view() const { return viewMatrix; }
+        // const glm::mat4& get_inverse_view() const { return inverseViewMatrix; }
+
+
+        // glm::vec3 get_viewer_position()  const { return viewer_position; }
+        // glm::vec3 get_view_position()    const { return view_position; }
+        // glm::vec3 get_camera_direction() const { return camera_direction; }
+        // glm::vec3 get_camera_up()        const { return camera_up; }
 };
 
-//-------------------------------------------------------------------------------//
-
-} // end of Vulkan namespace
+} // end of Vulkan namespcae
 
 #endif

@@ -1,29 +1,9 @@
-// #version 450
-
-// layout (location = 0) in vec3 fragColor;
-
-// layout (location = 0) out vec4 outColor;
-
-// layout(push_constant) uniform Push {
-//     mat4 modelMatrix;
-//     mat4 normalMatrix;
-// } push;
-
-// void main() {
-//   outColor = vec4(fragColor, 1.0);
-// }
-
 #version 450
 
 layout(location = 0) in vec3 fragColor;
 layout(location = 1) in vec3 norm;
 layout(location = 2) in vec3 fragPos;
 layout(location = 3) in vec3 viewPos;
-
-// layout(push_constant) uniform Push {
-//     mat4 modelMatrix;
-//     mat4 normalMatrix;
-// } push;
 
 layout(location = 0) out vec4 outColor;
 
@@ -49,7 +29,7 @@ void main() {
     vec3 result = fragColor * (ambient + diffuse + specular);
     
     vec3 dir = viewPos - fragPos;
-    result = clamp(0.5 * result, result, result / dot(dir, dir) * 650);
+    result = clamp(0.1 * result, result, result / dot(dir, dir) * 350);
 
     outColor = vec4(result, 1.0);
 }

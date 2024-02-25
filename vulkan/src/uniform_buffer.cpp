@@ -1,15 +1,13 @@
 #include "uniform_buffer.hpp"
- 
-#include <cassert>
-#include <cstring>
- 
+#include "camera.hpp"
+#include "window.hpp"
+
 namespace Vulkan 
 {
 
 //-------------------------------------------------------------------------------//
 
-UniformBuffer::UniformBuffer(Device& device, SwapChain& swapChain, Camera& camera, Window& window) : 
-    device_(device), swapChain_(swapChain), camera_(camera), window_(window) 
+UniformBuffer::UniformBuffer(Device& device, SwapChain& swapChain, Camera& camera, Window& window) : device_(device), swapChain_(swapChain), camera_(camera), window_(window) 
 {
     VkDeviceSize bufferSize = sizeof(UniformBufferObject);
 
@@ -23,20 +21,19 @@ UniformBuffer::UniformBuffer(Device& device, SwapChain& swapChain, Camera& camer
     {
         device.createBuffer(bufferSize, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, uniformBuffers_[i], uniformBuffersMemory_[i]);
 
-        vkMapMemory(device_.device(), uniformBuffersMemory_[i], 0, bufferSize, 0, &uniformBuffersMapped_[i]);
+        vkMapMemory(device_.getDevice(), uniformBuffersMemory_[i], 0, bufferSize, 0, &uniformBuffersMapped_[i]);
     }
-
 }
 
 //-------------------------------------------------------------------------------//
 
 UniformBuffer::~UniformBuffer() 
 {
-  for (size_t i = 0; i < swapChain_.MAX_FRAMES_IN_FLIGHT; i++) 
-  {
-        vkDestroyBuffer(device_.device(), uniformBuffers_[i], nullptr);
+    for (size_t i = 0; i < swapChain_.MAX_FRAMES_IN_FLIGHT; i++) 
+    {
+        vkDestroyBuffer(device_.getDevice(), uniformBuffers_[i], nullptr);
 
-        vkFreeMemory(device_.device(), uniformBuffersMemory_[i], nullptr);
+        vkFreeMemory(device_.getDevice(), uniformBuffersMemory_[i], nullptr);
     }
 }
 
@@ -44,15 +41,18 @@ UniformBuffer::~UniformBuffer()
 
 void UniformBuffer::update(uint32_t currentImage) 
 {
+    static auto startTime   = std::chrono::high_resolution_clock::now();
 
-    static auto startTime = std::chrono::high_resolution_clock::now();
+    auto currentTime        = std::chrono::high_resolution_clock::now();
+    
+    float time              = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
 
-    auto currentTime = std::chrono::high_resolution_clock::now();
-    float time = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
-
-    double x_prev, y_prev;
-    glfwGetCursorPos(window_.getGLFWwindow(), &x_prev, &y_prev);
+    double x_prev = 0, y_prev = 0;
+    
+    glfwGetCursorPos(window_.GetGLFWwindow(), &x_prev, &y_prev);
+    
     camera_.viewer_position += camera_.determine_move();
+    
     camera_.camera_direction = camera_.determine_rotate(x_prev, y_prev);
 
     UniformBuffer::UniformBufferObject ubo{};
@@ -63,8 +63,9 @@ void UniformBuffer::update(uint32_t currentImage)
     ubo.proj[1][1] *= -1;
 
     memcpy(uniformBuffersMapped_[currentImage], &ubo, sizeof(ubo));
+
 }
 
 //-------------------------------------------------------------------------------//
- 
-}  // end of Vulkan namespace 
+
+} // end of Vulkan namespace

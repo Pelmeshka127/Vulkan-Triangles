@@ -70,11 +70,7 @@ int main()
 
     bool *FlagArray = new bool [tr_numbers]{};
 
-    // std::clock_t start = clock();
-
     FindIntersectionsInNode(oct.root_, FlagArray);
-
-    Vulkan::Model::Builder builder{};
 
     glm::vec3 red_color     = {1.f, 0.f, 0.f};
 
@@ -83,6 +79,12 @@ int main()
     glm::vec3 color         = {0.f, 0.f, 0.f};
 
     auto triangle = triangles.begin();
+
+    std::vector<Vulkan::Model::Vertex> vertices;
+    std::vector<uint32_t> indices;
+
+    vertices.reserve(triangles.size() * 3);
+    indices.reserve(triangles.size() * 3 * 2);
 
     for (size_t i = 0; i < tr_numbers; i++, triangle++)
     {
@@ -96,25 +98,20 @@ int main()
         else
             color = blue_color;
 
-        builder.vertices.push_back({Vulkan::GetGlmVector(triangle->P1()), color, Vulkan::GetNormal(*triangle)});
+        vertices.push_back({Vulkan::GetGlmVector(triangle->P1()), color, Vulkan::GetNormal(*triangle)});
 
-        builder.vertices.push_back({Vulkan::GetGlmVector(triangle->P2()), color, Vulkan::GetNormal(*triangle)});
+        vertices.push_back({Vulkan::GetGlmVector(triangle->P2()), color, Vulkan::GetNormal(*triangle)});
 
-        builder.vertices.push_back({Vulkan::GetGlmVector(triangle->P3()), color, Vulkan::GetNormal(*triangle)});
+        vertices.push_back({Vulkan::GetGlmVector(triangle->P3()), color, Vulkan::GetNormal(*triangle)});
     }
 
-    for (uint32_t i = 0; i < tr_numbers * 3; i++)
-        builder.indices.push_back(i);
 
-    Point middle((bounding_box.X() + minBox.X()) / 2, (bounding_box.Y() + minBox.Y()) / 2, (bounding_box.Z() + minBox.Z()) / 2);
+    for (int i = 0; i != triangles.size() * 3; ++i)
+        indices.push_back(i);
 
-    float maxRadius = std::abs(std::max(bounding_box.X(), std::max(bounding_box.Y(), bounding_box.Z())));
+    Vulkan::App app(vertices, indices);
 
-    std::pair<Point, float> lightParametres{middle, maxRadius};
-
-    Vulkan::App app{builder, lightParametres};
-
-    app.RunApplication();
+    app.run();
 
     return 0;
 }

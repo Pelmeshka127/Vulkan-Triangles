@@ -1,9 +1,8 @@
 #ifndef KEYBOARD_HPP_
 #define KEYBOARD_HPP_
 
-#include "object.hpp"
-#include "window.hpp"
-#include "camera.hpp"
+#include <iostream>
+#include <array>
 
 namespace Vulkan
 {
@@ -12,31 +11,26 @@ namespace Vulkan
 
 class Keyboard
 {
+    private:
+        static constexpr int NUMBER_OF_KEYBOARD_KEYS = 348; 
+        static constexpr int NUMBER_OF_MOUSE_BUTTONS = 7;
+
+
     public:
 
-    struct KeyMappings {
-        int MoveLeft        = GLFW_KEY_A;
-        int MoveRight       = GLFW_KEY_D;
-        int MoveForward     = GLFW_KEY_W;
-        int MoveBackward    = GLFW_KEY_S;
-        int MoveUp          = GLFW_KEY_E;
-        int MoveDown        = GLFW_KEY_Q;
-        int LookLeft        = GLFW_KEY_LEFT;
-        int LookRight       = GLFW_KEY_RIGHT;
-        int LookUp          = GLFW_KEY_UP;
-        int LookDown        = GLFW_KEY_DOWN;
-        int SpeedUp         = GLFW_KEY_P;
-        int SpeedDown       = GLFW_KEY_O;
-    };  
+        static std::array<bool, NUMBER_OF_KEYBOARD_KEYS> keyboard_keys;
+        static std::array<bool, NUMBER_OF_MOUSE_BUTTONS> mouse_buttons;
 
-    void MoveInPlainXZ(GLFWwindow* window, float dt, Object& object, Camera& camera);
+        static bool is_keyboard_key(int key) { return keyboard_keys[key]; }
+        static void press_keyboard_key(int key) { keyboard_keys[key] = true; }
+        static void release_keyboard_key(int key) { keyboard_keys[key] = false; }
 
-    KeyMappings keys{};
+        static bool is_mouse_button(int key) { return mouse_buttons[key]; }
+        static void press_mouse_button(int key) { mouse_buttons[key] = true; } 
+        static void release_mouse_button(int key) { mouse_buttons[key] = false; }
 
-    float move_speed_{100.f};
-
-    float look_spped_{3.f};
-
+        // static constexpr int get_NUMBER_OF_KEYBOARD_KEYS() { return NUMBER_OF_KEYBOARD_KEYS; }
+        // static constexpr int get_NUMBER_OF_MOUSE_BUTTONS() { return NUMBER_OF_MOUSE_BUTTONS; }
 };
 
 //-------------------------------------------------------------------------------//

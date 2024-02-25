@@ -1,13 +1,14 @@
 #include "descriptor.hpp"
-#include "vulkan/vulkan.hpp"
+#include "device.hpp"
+#include "uniform_buffer.hpp"
 
-namespace Vulkan
+namespace Vulkan 
 {
 
 //-------------------------------------------------------------------------------//
 
-DescriptorSetLayout::DescriptorSetLayout(Device & device) : device_(device) {
-    
+DescriptorSetLayout::DescriptorSetLayout(Device& device) : device_(device)
+{
     VkDescriptorSetLayoutBinding uboLayoutBinding{};
 
     uboLayoutBinding.binding            = 0;
@@ -27,7 +28,7 @@ DescriptorSetLayout::DescriptorSetLayout(Device & device) : device_(device) {
     descriptorSetLayoutInfo.pBindings       = &uboLayoutBinding;
 
     if (vkCreateDescriptorSetLayout(
-        device.device(),
+        device_.getDevice(),
         &descriptorSetLayoutInfo,
         nullptr,
         &descriptorSetLayout_) != VK_SUCCESS) 
@@ -40,7 +41,7 @@ DescriptorSetLayout::DescriptorSetLayout(Device & device) : device_(device) {
 
 DescriptorSetLayout::~DescriptorSetLayout() 
 {
-    vkDestroyDescriptorSetLayout(device_.device(), descriptorSetLayout_, nullptr);
+    vkDestroyDescriptorSetLayout(device_.getDevice(), descriptorSetLayout_, nullptr);
 }
 
 //-------------------------------------------------------------------------------//
@@ -63,7 +64,7 @@ DescriptorPool::DescriptorPool(Device& device, SwapChain& swapChain)
     
     descriptorPoolInfo.pPoolSizes = &poolSize;
     
-    if (vkCreateDescriptorPool(device.device(), &descriptorPoolInfo, nullptr, &descriptorPool_) !=
+    if (vkCreateDescriptorPool(device_.getDevice(), &descriptorPoolInfo, nullptr, &descriptorPool_) !=
         VK_SUCCESS) 
     {
         throw std::runtime_error("failed to create descriptor pool!");
@@ -74,18 +75,18 @@ DescriptorPool::DescriptorPool(Device& device, SwapChain& swapChain)
 
 DescriptorPool::~DescriptorPool() 
 {
-    vkDestroyDescriptorPool(device_.device(), descriptorPool_, nullptr);
+    vkDestroyDescriptorPool(device_.getDevice(), descriptorPool_, nullptr);
 }
 
 //-------------------------------------------------------------------------------//
 
 
 DescriptorSets::DescriptorSets(Device & device, SwapChain & swapChain, UniformBuffer & uniformBuffer, DescriptorSetLayout & descripterSetLayout, DescriptorPool & descripterPool) :
-    device_(device), swapChain_(swapChain), uniformBuffer_(uniformBuffer), descriptorSetLayout_(descripterSetLayout), descriptorPool_(descripterPool) {
-    
+    device_(device), swapChain_(swapChain), uniformBuffer_(uniformBuffer), descriptorSetLayout_(descripterSetLayout), descriptorPool_(descripterPool) 
+{
     std::vector<VkDescriptorSetLayout> layouts(swapChain.MAX_FRAMES_IN_FLIGHT, descriptorSetLayout_.getDescriptorSetLayout_());
 
-    VkDescriptorSetAllocateInfo allocInfo;
+    VkDescriptorSetAllocateInfo allocInfo{};
 
     allocInfo.descriptorPool = descripterPool.getDescriptorPool();
 
@@ -95,9 +96,9 @@ DescriptorSets::DescriptorSets(Device & device, SwapChain & swapChain, UniformBu
 
     descriptorSets_.resize(swapChain.MAX_FRAMES_IN_FLIGHT);
 
-    if (vkAllocateDescriptorSets(device_.device(), &allocInfo, descriptorSets_.data()) != VK_SUCCESS)
+    if (vkAllocateDescriptorSets(device_.getDevice(), &allocInfo, descriptorSets_.data()) != VK_SUCCESS)
         throw std::runtime_error("failed to allocate descriptor sets!");
-
+    
     for (size_t i = 0; i < swapChain.MAX_FRAMES_IN_FLIGHT; i++) 
     {
         VkDescriptorBufferInfo bufferInfo{
@@ -106,7 +107,7 @@ DescriptorSets::DescriptorSets(Device & device, SwapChain & swapChain, UniformBu
             uniformBuffer_.getSizeOfUniformBufferObject()
         };
 
-        VkWriteDescriptorSet descriptorWrite;
+        VkWriteDescriptorSet descriptorWrite{};
 
         descriptorWrite.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
 
@@ -124,7 +125,7 @@ DescriptorSets::DescriptorSets(Device & device, SwapChain & swapChain, UniformBu
 
         descriptorWrite.pBufferInfo = &bufferInfo;
 
-        vkUpdateDescriptorSets(device_.device(), 1, &descriptorWrite, 0, nullptr);
+        vkUpdateDescriptorSets(device_.getDevice(), 1, &descriptorWrite, 0, nullptr);
     }
 }
 
