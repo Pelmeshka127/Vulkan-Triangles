@@ -29,15 +29,15 @@ class SwapChain
         
         const VkRenderPass& getRenderPass() const { return renderPass_; }
         
-        const std::vector<VkFramebuffer>& getFramebuffers() const& { return swapChainFramebuffers_; }
+        const std::vector<VkFramebuffer>& getFramebuffers() const { return swapChainFramebuffers_; }
         
         const VkExtent2D getExtent() const { return swapChainExtent_; }
         
-        const std::vector<VkSemaphore> getImageAvailableSemaphores() const& { return imageAvailableSemaphores_; }
+        const std::vector<VkSemaphore> getImageAvailableSemaphores() const { return imageAvailableSemaphores_; }
         
-        const std::vector<VkSemaphore> getRenderFinishedSemaphores() const& { return renderFinishedSemaphores_; }
+        const std::vector<VkSemaphore> getRenderFinishedSemaphores() const { return renderFinishedSemaphores_; }
         
-        const std::vector<VkFence>     getInFlightFences() const& { return inFlightFences_; }
+        const std::vector<VkFence>     getInFlightFences() const { return inFlightFences_; }
         
         void recreate();
 

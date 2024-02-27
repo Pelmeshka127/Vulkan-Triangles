@@ -49,25 +49,25 @@ public:
     
     ~Device();
 
-    Device(const Device&)  = delete;
+    Device(const Device&) = delete;
     
-    Device & operator=(const Device&) = delete;
+    Device& operator=(const Device&) = delete;
     
     Device(const Device&&) = delete;
     
-    Device & operator=(const Device&&) = delete;
+    Device& operator=(const Device&&) = delete;
 
-    const VkCommandPool& getCommandPool()       const & { return commandPool_; }
+    const VkCommandPool& getCommandPool()       const { return commandPool_; }
     
-    const VkDevice& getDevice()                 const & { return device_; }
+    const VkDevice& getDevice()                 const { return device_; }
     
-    const VkSurfaceKHR& getSurface()            const & { return surface_; }
+    const VkSurfaceKHR& getSurface()            const { return surface_; }
     
-    const VkQueue& getGraphicsQueue()           const & { return graphicsQueue_; }
+    const VkQueue& getGraphicsQueue()           const { return graphicsQueue_; }
     
-    const VkQueue& getPresentQueue()            const & { return presentQueue_; }
+    const VkQueue& getPresentQueue()            const { return presentQueue_; }
     
-    const VkPhysicalDevice& getPhysicalDevice() const & { return physicalDevice_; }
+    const VkPhysicalDevice& getPhysicalDevice() const { return physicalDevice_; }
     
     uint32_t findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties);
     

@@ -39,7 +39,7 @@ UniformBuffer::~UniformBuffer()
 
 //-------------------------------------------------------------------------------//
 
-void UniformBuffer::update(uint32_t currentImage, const glm::mat4& view, const glm::mat4& proj, const glm::vec3& camera_pos) 
+void UniformBuffer::update(uint32_t currentImage) 
 {
     static auto startTime   = std::chrono::high_resolution_clock::now();
 
@@ -47,24 +47,20 @@ void UniformBuffer::update(uint32_t currentImage, const glm::mat4& view, const g
     
     float time              = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
 
-    double x_prev = 0, y_prev = 0;
+    camera_.determineMove();
     
-    glfwGetCursorPos(window_.GetGLFWwindow(), &x_prev, &y_prev);
-    
-    // camera_.viewer_position += camera_.determine_move();
-    
-    // camera_.camera_direction = camera_.determine_rotate(x_prev, y_prev);
+    camera_.determineRotate();
+
+    camera_.updateViewMatrix();
 
     UniformBuffer::UniformBufferObject ubo{};
-    
-    ubo.viewPos = camera_pos;
-    ubo.view = view;
-    ubo.proj = glm::perspective(glm::radians(45.0f), swapChain_.getExtent().width / (float) swapChain_.getExtent().height, 0.1f, 1000.0f);
-    ubo.model =glm::mat4(1.0f);
+    ubo.model = glm::mat4(1.0f);
+    ubo.view = camera_.getVeiwMatrix();
+    ubo.proj = glm::perspective(glm::radians(45.0f), swapChain_.getExtent().width / (float) swapChain_.getExtent().height, 0.1f, 10000.0f);
+    ubo.viewPos = camera_.getPosition();
     ubo.proj[1][1] *= -1;
 
     memcpy(uniformBuffersMapped_[currentImage], &ubo, sizeof(ubo));
-
 }
 
 //-------------------------------------------------------------------------------//

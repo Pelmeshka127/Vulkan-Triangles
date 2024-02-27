@@ -32,7 +32,7 @@ class Model
 
         Model(const Model&) = delete;
         
-        Model &operator=(const Model&) = delete;
+        Model& operator=(const Model&) = delete;
 
         std::vector<Vertex> vertices_;
         

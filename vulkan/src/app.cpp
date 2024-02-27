@@ -7,18 +7,13 @@ namespace Vulkan
 
 void App::run() 
 {
-    glfwGetCursorPos(window.GetGLFWwindow(), &m_initial_mouse_pos_x, &m_initial_mouse_pos_y);
-
-    camera.set_viewport_size(static_cast<float>(WIDTH), static_cast<float>(HEIGHT));
-
     while (!window.ShouldClose()) 
     {
         glfwPollEvents();
-        glfwSetKeyCallback (window.GetGLFWwindow(), key_callback);
-        glfwSetMouseButtonCallback(window.GetGLFWwindow(), mouse_button_callback);
+        
+        glfwSetKeyCallback(window.GetGLFWwindow(), keyCallback);
+        
         drawFrame();
-        on_update();
-        std::cout << camera.get_position().x << std::endl;
     }
 
     vkDeviceWaitIdle(device.getDevice());
@@ -44,7 +39,7 @@ void App::drawFrame()
     else if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR) 
         throw std::runtime_error("failed to acquire swap chain image!");
 
-    uniformBuffer.update(render.currentFrame_, camera.get_projection_matrix(), camera.get_view_matrix(), camera.get_position());
+    uniformBuffer.update(render.currentFrame_);
     
     if (vkResetFences(device.getDevice(), 1, &swapChain.getInFlightFences()[render.currentFrame_]) != VK_SUCCESS)
         throw std::runtime_error("failed to reset Fences!");
@@ -99,24 +94,13 @@ void App::drawFrame()
 
 //-------------------------------------------------------------------------------//
 
-void App::mouse_button_callback (GLFWwindow* window, int button, int action, int mods) noexcept
-{
-    if (action == GLFW_PRESS)        
-        Keyboard::press_mouse_button(button);
-    
-    else if (action == GLFW_RELEASE) 
-        Keyboard::release_mouse_button(button);
-}
-
-//-------------------------------------------------------------------------------//
-
-void App::key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) 
+void App::keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods) 
 {
     if (action == GLFW_PRESS || action == GLFW_REPEAT) 
-        Keyboard::press_keyboard_key(key);
+        Keyboard::pressKeyboardKey(key);
     
     else if (action == GLFW_RELEASE)                   
-        Keyboard::release_keyboard_key(key);
+        Keyboard::releaseKeyboardKey(key);
 }
 
 //-------------------------------------------------------------------------------//
@@ -152,56 +136,5 @@ glm::vec3 GetGlmVector(const Point& point)
 }
 
 //-------------------------------------------------------------------------------//
-
-void App::on_update()
-{
-    glm::vec3 movement_delta{ 0, 0, 0 };
-    glm::vec3 rotation_delta{ 0, 0, 0 };
-
-    if (Keyboard::is_keyboard_key(GLFW_KEY_W))
-    {
-        movement_delta.x += delta;
-    }
-    if (Keyboard::is_keyboard_key(GLFW_KEY_S))
-    {
-        movement_delta.x -= delta;
-    }
-    if (Keyboard::is_keyboard_key(GLFW_KEY_A))
-    {
-        movement_delta.y -= delta;
-    }
-    if (Keyboard::is_keyboard_key(GLFW_KEY_D))
-    {
-        movement_delta.y += delta;
-    }
-    if (Keyboard::is_keyboard_key(GLFW_KEY_E))
-    {
-        movement_delta.z += delta;
-    }
-    if (Keyboard::is_keyboard_key(GLFW_KEY_Q))
-    {
-        movement_delta.z -= delta;
-    }
-
-    if (Keyboard::is_keyboard_key(GLFW_KEY_UP))
-    {
-        rotation_delta.y -= 0.5f;
-    }
-    if (Keyboard::is_keyboard_key(GLFW_KEY_DOWN))
-    {
-        rotation_delta.y += 0.5f;
-    }
-    if (Keyboard::is_keyboard_key(GLFW_KEY_RIGHT))
-    {
-        rotation_delta.z -= 0.5f;
-    }
-    if (Keyboard::is_keyboard_key(GLFW_KEY_LEFT))
-    {
-        rotation_delta.z += 0.5f;
-    }
-
-
-    camera.add_movement_and_rotation(movement_delta, rotation_delta);
-}
 
 } // end of Vulkan namespace

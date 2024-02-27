@@ -22,7 +22,7 @@ class Pipeline
         
         ~Pipeline();
 
-        Pipeline&operator=(const Pipeline&) = delete;
+        Pipeline& operator=(const Pipeline&) = delete;
         
         Pipeline(const Pipeline&) = delete;
 

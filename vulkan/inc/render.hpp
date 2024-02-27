@@ -24,7 +24,7 @@ class Render
 
         Render(const Render&) = delete;
         
-        Render&operator=(const Render&) = delete;
+        Render& operator=(const Render&) = delete;
 
         const std::vector<VkCommandBuffer>& getCommandBuffers() const { return commandBuffers_; }
 

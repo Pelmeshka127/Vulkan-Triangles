@@ -32,12 +32,8 @@ glm::vec3 GetNormal(const Triangle& triangle);
 
 //-------------------------------------------------------------------------------//
 
-const uint32_t WIDTH = 800;
+const uint32_t WIDTH  = 800;
 const uint32_t HEIGHT = 600;
-
-// static double prev_x = 0.0;
-// static double prev_y = 0.0;
-// static bool lpress = false;
 
 class App 
 {
@@ -47,41 +43,33 @@ class App
 
         App(std::vector<Model::Vertex> vertices, std::vector<uint32_t> indices) : model(device, vertices, indices) {}
 
-        void on_update();
-        
     private:
         
         Camera camera{};
         
-        Window window { WIDTH, HEIGHT, "vulkan" };
+        Window window{WIDTH, HEIGHT, "vulkan" };
         
-        Device device { window };
+        Device device{window };
         
-        SwapChain swapChain { window, device };
+        SwapChain swapChain{window, device };
         
-        DescriptorSetLayout descriptorSetLayout { device };
+        DescriptorSetLayout descriptorSetLayout{device };
         
-        Pipeline pipeline { device, swapChain, descriptorSetLayout, "vert.spv", "frag.spv" };
+        Pipeline pipeline{device, swapChain, descriptorSetLayout, "vert.spv", "frag.spv"};
         
         Model model;
         
-        UniformBuffer uniformBuffer   { device, swapChain, camera, window };
+        UniformBuffer uniformBuffer{device, swapChain, camera, window };
         
-        DescriptorPool descriptorPool { device, swapChain };
+        DescriptorPool descriptorPool{device, swapChain };
         
-        DescriptorSets descriptorSets { device, swapChain, uniformBuffer, descriptorSetLayout, descriptorPool };
+        DescriptorSets descriptorSets{device, swapChain, uniformBuffer, descriptorSetLayout, descriptorPool };
         
-        Render render { device, swapChain, pipeline, model, descriptorSets };
+        Render render{device, swapChain, pipeline, model, descriptorSets };
         
         void drawFrame();
 
-        static void mouse_button_callback (GLFWwindow* window, int button, int action, int mods) noexcept;
-        
-        static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
-
-        double m_initial_mouse_pos_x = 0.0;
-        double m_initial_mouse_pos_y = 0.0;
-        float delta = 0.05f;    
+        static void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
 };
 
 //-------------------------------------------------------------------------------//
