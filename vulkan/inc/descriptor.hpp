@@ -79,17 +79,17 @@ class DescriptorSets
 
     private:
         
-        std::vector<VkDescriptorSet> descriptorSets_;
+        std::vector<VkDescriptorSet>    descriptorSets_;
         
-        Device&                 device_;
+        Device&                         device_;
         
-        SwapChain&              swapChain_;
+        SwapChain&                      swapChain_;
         
-        UniformBuffer&          uniformBuffer_;
+        UniformBuffer&                  uniformBuffer_;
 
-        DescriptorSetLayout&    descriptorSetLayout_;
+        DescriptorSetLayout&            descriptorSetLayout_;
         
-        DescriptorPool&         descriptorPool_;
+        DescriptorPool&                 descriptorPool_;
 };
 
 //-------------------------------------------------------------------------------//

@@ -32,8 +32,9 @@ glm::vec3 GetNormal(const Triangle& triangle);
 
 //-------------------------------------------------------------------------------//
 
-const uint32_t WIDTH  = 800;
-const uint32_t HEIGHT = 600;
+const uint32_t Width  = 800;
+
+const uint32_t Height = 600;
 
 class App 
 {
@@ -47,7 +48,7 @@ class App
         
         Camera camera{};
         
-        Window window{WIDTH, HEIGHT, "vulkan" };
+        Window window{Width, Height, "vulkan" };
         
         Device device{window };
         

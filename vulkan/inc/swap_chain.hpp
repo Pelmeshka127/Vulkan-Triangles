@@ -25,19 +25,19 @@ class SwapChain
         
         void cleanup();
         
-        const VkSwapchainKHR& getSwapChain() const { return swapChain_; }
+        const VkSwapchainKHR& getSwapChain()                            const { return swapChain_; }
         
-        const VkRenderPass& getRenderPass() const { return renderPass_; }
+        const VkRenderPass& getRenderPass()                             const { return renderPass_; }
         
-        const std::vector<VkFramebuffer>& getFramebuffers() const { return swapChainFramebuffers_; }
+        const std::vector<VkFramebuffer>& getFramebuffers()             const { return swapChainFramebuffers_; }
         
-        const VkExtent2D getExtent() const { return swapChainExtent_; }
+        const VkExtent2D getExtent()                                    const { return swapChainExtent_; }
         
-        const std::vector<VkSemaphore> getImageAvailableSemaphores() const { return imageAvailableSemaphores_; }
+        const std::vector<VkSemaphore> getImageAvailableSemaphores()    const { return imageAvailableSemaphores_; }
         
-        const std::vector<VkSemaphore> getRenderFinishedSemaphores() const { return renderFinishedSemaphores_; }
+        const std::vector<VkSemaphore> getRenderFinishedSemaphores()    const { return renderFinishedSemaphores_; }
         
-        const std::vector<VkFence>     getInFlightFences() const { return inFlightFences_; }
+        const std::vector<VkFence>     getInFlightFences()              const { return inFlightFences_; }
         
         void recreate();
 
@@ -59,21 +59,21 @@ class SwapChain
         
         void createSyncObjects();
 
-        VkSurfaceFormatKHR  chooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats);
+        VkSurfaceFormatKHR          chooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats);
         
-        VkPresentModeKHR    chooseSwapPresentMode(const std::vector<VkPresentModeKHR>& availablePresentModes);
+        VkPresentModeKHR            chooseSwapPresentMode(const std::vector<VkPresentModeKHR>& availablePresentModes);
         
-        VkExtent2D          chooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities);
+        VkExtent2D                  chooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities);
 
-        VkImageView         createImageView(VkImage image, VkFormat format, VkImageAspectFlags aspectFlags);
+        VkImageView                 createImageView(VkImage image, VkFormat format, VkImageAspectFlags aspectFlags);
         
-        VkFormat            findDepthFormat();
+        VkFormat                    findDepthFormat();
     
-        Window&             window_;
+        Window&                     window_;
         
-        Device&             device_;
+        Device&                     device_;
         
-        VkExtent2D          swapChainExtent_;
+        VkExtent2D                  swapChainExtent_;
 
         VkSwapchainKHR              swapChain_;
         
@@ -85,13 +85,13 @@ class SwapChain
         
         std::vector<VkFramebuffer>  swapChainFramebuffers_;
         
-        VkRenderPass    renderPass_;
+        VkRenderPass                renderPass_;
 
-        VkImage         depthImage_;
+        VkImage                     depthImage_;
         
-        VkDeviceMemory  depthImageMemory_;
+        VkDeviceMemory              depthImageMemory_;
         
-        VkImageView     depthImageView_;
+        VkImageView                 depthImageView_;
 
         std::vector<VkSemaphore>    imageAvailableSemaphores_;
         

@@ -52,7 +52,7 @@ void Model::createVertexBuffer()
     
     vkUnmapMemory(device_.getDevice(), stagingBufferMemory);
     
-    device_.createBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT  | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, vertexBuffer_, vertexBufferMemory_);
+    device_.createBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, vertexBuffer_, vertexBufferMemory_);
 
     device_.copyBuffer(stagingBuffer, vertexBuffer_, bufferSize);
 

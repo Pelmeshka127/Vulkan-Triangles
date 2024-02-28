@@ -72,7 +72,8 @@ Device::Device(Window& window) : window_{window}
 
 //-------------------------------------------------------------------------------//
 
-Device::~Device() {
+Device::~Device() 
+{
     vkDestroyCommandPool(device_, commandPool_, nullptr);
 
     vkDestroyDevice(device_, nullptr);

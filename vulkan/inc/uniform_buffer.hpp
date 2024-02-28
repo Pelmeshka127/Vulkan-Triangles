@@ -46,19 +46,19 @@ class UniformBuffer
 
     private:
         
-        Device&     device_;
+        Device&                         device_;
         
-        SwapChain&  swapChain_;
+        SwapChain&                      swapChain_;
         
-        Camera&     camera_;
+        Camera&                         camera_;
         
-        Window&     window_;
+        Window&                         window_;
 
-        std::vector<VkBuffer>         uniformBuffers_;
+        std::vector<VkBuffer>           uniformBuffers_;
         
-        std::vector<VkDeviceMemory>   uniformBuffersMemory_;
+        std::vector<VkDeviceMemory>     uniformBuffersMemory_;
         
-        std::vector<void*>            uniformBuffersMapped_;
+        std::vector<void*>              uniformBuffersMapped_;
     
 };
 

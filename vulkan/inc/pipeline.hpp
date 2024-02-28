@@ -38,21 +38,19 @@ class Pipeline
         
         DescriptorSetLayout&    descriptorSetLayout_;
         
-        std::string vertFilepath_;
+        std::string             vertFilepath_;
         
-        std::string fragFilepath_;
+        std::string             fragFilepath_;
 
-        VkPipelineLayout    pipelineLayout_;
+        VkPipelineLayout        pipelineLayout_;
         
-        VkPipeline          graphicsPipeline_;
+        VkPipeline              graphicsPipeline_;
 
-        VkShaderModule  vertShaderModule_;
+        VkShaderModule          vertShaderModule_;
         
-        VkShaderModule  fragShaderModule_;
+        VkShaderModule          fragShaderModule_;
         
         static std::vector<char> readFile(const std::string& filename);
-        
-        void createGraphicsPipeline();
         
         void createShaderModule(const std::string& filePath, VkShaderModule* shaderModule); 
 };

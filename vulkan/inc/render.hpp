@@ -32,17 +32,17 @@ class Render
   
     private:
         
-        std::vector<VkCommandBuffer> commandBuffers_;
+        std::vector<VkCommandBuffer>    commandBuffers_;
         
-        Device&         device_;
+        Device&                         device_;
         
-        SwapChain&      swapChain_;
+        SwapChain&                      swapChain_;
         
-        Pipeline&       pipeline_;
+        Pipeline&                       pipeline_;
         
-        Model&          model_;
+        Model&                          model_;
         
-        DescriptorSets& descriptorSets_;
+        DescriptorSets&                 descriptorSets_;
 };
 
 //-------------------------------------------------------------------------------//
