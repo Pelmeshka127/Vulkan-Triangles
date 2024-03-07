@@ -1,7 +1,16 @@
 # Vulkan-Triangles
 
 ## Введение
-В данном проекте реализован второй уровень задачи о [треугольниках](https://github.com/Pelmeshka127/Triangles-3D) - графическая визуализация при попомщи [Vulkan API](https://www.vulkan.org). Для знакомства с вулканом я использовал этот [ресурс](https://www.youtube.com/playlist?list=PL8327DO66nu9qYVKLDmdLW_84-yE4auCR).
+В данном проекте реализован второй уровень задачи о [треугольниках](https://github.com/Pelmeshka127/Triangles-3D) - графическая визуализация при по помощи [Vulkan API](https://www.vulkan.org). Для знакомства с вулканом я использовал этот [ресурс](https://www.youtube.com/playlist?list=PL8327DO66nu9qYVKLDmdLW_84-yE4auCR).
+
+Проект был написан на операционной системе macOS.
+Для работы проекта необходимы:
+1. CMake Version 3.8
+2. glfw
+3. glm
+4. Vulkan SDK
+5. glsl
+6. GoogleTest
 
 ## Установка и заупск
 Для установки проекта:

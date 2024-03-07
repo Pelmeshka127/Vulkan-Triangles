@@ -53,6 +53,7 @@ void App::drawFrame()
     VkSemaphore signalSemaphores[] = {swapChain.getRenderFinishedSemaphores()[render.currentFrame_]};
 
     VkSubmitInfo submitInfo{};
+    submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
     submitInfo.waitSemaphoreCount = 1;
     submitInfo.pWaitSemaphores = waitSemaphores;
     submitInfo.pWaitDstStageMask = waitStages;

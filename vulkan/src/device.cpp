@@ -1,5 +1,4 @@
 #include "device.hpp"
-// #include "gtest/gtest.h"
 #include <iostream>
 
 namespace Vulkan 
@@ -391,6 +390,12 @@ bool Device::checkValidationLayerSupport()
     }
 
     return true;
+
+    // return std::find_if(validationLayers.begin(), validationLayers.end(), [&availableLayers](auto&& layerName) {
+    //     return std::find_if(availableLayers.begin(), availableLayers.end(), [&layerName](auto&& layer) {
+    //         return std::strcmp(layer.layerName, layerName) == 0;
+    //     }) != availableLayers.end();
+    // }) != validationLayers.end();
 }
 
 //-------------------------------------------------------------------------------//

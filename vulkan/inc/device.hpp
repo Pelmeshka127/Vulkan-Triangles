@@ -133,7 +133,11 @@ class Device
         
         VkPhysicalDevice physicalDevice_ = nullptr;
 
+    #ifdef NDEBUG
+        const std::array<const char*, 0> validationLayers = {};
+    #else
         const std::array<const char*, 1> validationLayers = {"VK_LAYER_KHRONOS_validation"};
+    #endif
             
         const std::array<const char*, 1> deviceExtensions = {VK_KHR_SWAPCHAIN_EXTENSION_NAME};
 
