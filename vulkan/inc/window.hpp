@@ -1,7 +1,6 @@
 #ifndef WINDOW_HPP_
 #define WINDOW_HPP_
 
-#include <_types/_uint32_t.h>
 #define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
 #include <sys/_types/_u_int32_t.h>
