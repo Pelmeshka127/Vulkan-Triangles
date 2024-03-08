@@ -44,23 +44,23 @@ void App::drawFrame()
     if (vkResetFences(device.getDevice(), 1, &swapChain.getInFlightFences()[render.currentFrame_]) != VK_SUCCESS)
         throw std::runtime_error("failed to reset Fences!");
 
-    render.record(render.getCommandBuffers()[render.currentFrame_], imageIndex);
+    render.record(render.getCommandBuffers()[render.currentFrame_], imageIndex);\
 
-    VkSemaphore waitSemaphores[] = {swapChain.getImageAvailableSemaphores()[render.currentFrame_]};
-    
-    VkPipelineStageFlags waitStages[] = {VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT};
-    
-    VkSemaphore signalSemaphores[] = {swapChain.getRenderFinishedSemaphores()[render.currentFrame_]};
+    VkSubmitInfo submitInfo = {};
+    submitInfo.sType        = VK_STRUCTURE_TYPE_SUBMIT_INFO;
 
-    VkSubmitInfo submitInfo{};
-    submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
-    submitInfo.waitSemaphoreCount = 1;
-    submitInfo.pWaitSemaphores = waitSemaphores;
-    submitInfo.pWaitDstStageMask = waitStages;
-    submitInfo.commandBufferCount = 1;
-    submitInfo.pCommandBuffers = &render.getCommandBuffers()[render.currentFrame_];
+    VkSemaphore waitSemaphores[]        = {swapChain.getImageAvailableSemaphores()[render.currentFrame_]};
+    VkPipelineStageFlags waitStages[]   = {VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT};
+    submitInfo.waitSemaphoreCount       = 1;
+    submitInfo.pWaitSemaphores          = waitSemaphores;
+    submitInfo.pWaitDstStageMask        = waitStages;
+
+    submitInfo.commandBufferCount   = 1;
+    submitInfo.pCommandBuffers      = &render.getCommandBuffers()[render.currentFrame_];
+
+    VkSemaphore signalSemaphores[]  = {swapChain.getRenderFinishedSemaphores()[render.currentFrame_]};
     submitInfo.signalSemaphoreCount = 1;
-    submitInfo.pSignalSemaphores = signalSemaphores;
+    submitInfo.pSignalSemaphores    = signalSemaphores;
 
     vkResetFences(device.getDevice(), 1, &swapChain.getInFlightFences()[render.currentFrame_]);
 
