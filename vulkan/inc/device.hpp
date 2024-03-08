@@ -8,6 +8,8 @@
 #include <set>
 #include <iostream>
 #include <array>
+#include <algorithm>
+#include <cstring>
 
 #define NDEBUG
 
