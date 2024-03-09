@@ -44,7 +44,7 @@ void App::drawFrame()
     if (vkResetFences(device.getDevice(), 1, &swapChain.getInFlightFences()[render.currentFrame_]) != VK_SUCCESS)
         throw std::runtime_error("failed to reset Fences!");
 
-    render.record(render.getCommandBuffers()[render.currentFrame_], imageIndex);\
+    render.record(render.getCommandBuffers()[render.currentFrame_], imageIndex);
 
     VkSubmitInfo submitInfo = {};
     submitInfo.sType        = VK_STRUCTURE_TYPE_SUBMIT_INFO;
