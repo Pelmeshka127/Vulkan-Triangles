@@ -1,4 +1,3 @@
-// #include <ctime>
 #include <vector>
 #include <fstream>
 #include <set>
@@ -105,6 +104,7 @@ int main()
         vertices.push_back({Vulkan::GetGlmVector(triangle->P3()), color, Vulkan::GetNormal(*triangle)});
     }
 
+    delete [] FlagArray;
 
     for (int i = 0; i != triangles.size() * 3; ++i)
         indices.push_back(i);
