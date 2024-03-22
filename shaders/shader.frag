@@ -9,9 +9,13 @@ layout(location = 0) out vec4 outColor;
 
 void main() 
 {
-    vec3 lightColor = vec3(1.0, 1.0, 1.0);
+    vec3 lightColor         = vec3(1.0, 1.0, 1.0);
 
-    vec3 amb_color          = vec3(0.2, 0.0, 0.8);
+    vec3 amb_color          = vec3(0.05, 0.0, 0.8);
+    
+    if (fragColor == vec3(1.0, 0.0, 0.0))
+        amb_color = vec3(0.8, 0.0, 0.2);    
+    
     float ambient_strength  = 0.2;
     vec3 ambient            = amb_color * ambient_strength;
     vec3 lightDir           = normalize(viewPos - fragPos);
@@ -20,17 +24,17 @@ void main()
     float diff              = max(dot(normal, lightDir), 0.0);
     vec3 diffuse            = diffuse_strength * diff * lightColor;
 
-    vec3 viewDir    = normalize(viewPos - fragPos);
-    vec3 reflectDir = reflect(-lightDir, normal);
+    vec3 viewDir            = normalize(viewPos - fragPos);
+    vec3 reflectDir         = reflect(-lightDir, normal);
 
     float specularStrength  = 1.0;
     float spec              = pow(max(dot(viewDir, reflectDir), 0.0), 100);
     vec3 specular           = specularStrength * spec * lightColor;
 
-    vec3 result = fragColor * diffuse + specular + ambient;
+    vec3 result             = fragColor * diffuse + specular + ambient;
     
-    vec3 dir    = viewPos - fragPos;
-    result      = clamp(0.8 * result, result, result / dot(dir, dir) * 1000);
+    vec3 dir                = viewPos - fragPos;
+    result                  = clamp(0.8 * result, result, result / dot(dir, dir) * 1000);
 
-    outColor = vec4(result, 1.0);
+    outColor                = vec4(result, 1.0);
 }
