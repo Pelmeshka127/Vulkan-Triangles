@@ -12,33 +12,34 @@ void Camera::determineMove()
     glm::vec3 movement{0.0f, 0.0f, 0.0f};
 
     if (Keyboard::isKeyboardKey(GLFW_KEY_W))
-        movement += glm::normalize(direction) * speed;
+        movement += glm::normalize(direction);
 
     if (Keyboard::isKeyboardKey(GLFW_KEY_S))
-        movement -= glm::normalize(direction) * speed;
+        movement -= glm::normalize(direction);
 
     if (Keyboard::isKeyboardKey(GLFW_KEY_A))
-        movement -= glm::normalize(glm::cross (direction, up)) * speed;
+        movement -= glm::normalize(glm::cross (direction, up));
 
     if (Keyboard::isKeyboardKey(GLFW_KEY_D))
-        movement += glm::normalize(glm::cross (direction, up)) * speed;
+        movement += glm::normalize(glm::cross (direction, up));
 
     if (Keyboard::isKeyboardKey(GLFW_KEY_Q))
-        movement -= glm::normalize(up) * speed;
+        movement -= glm::normalize(up);
 
     if (Keyboard::isKeyboardKey(GLFW_KEY_E))
-        movement += glm::normalize(up) * speed;
+        movement += glm::normalize(up);
+
+    if (glm::dot(movement, movement) > std::numeric_limits<float>::epsilon())
+        position += movement * speed;
 
     if (Keyboard::isKeyboardKey(GLFW_KEY_P))
-        speed += 0.01f;
+        speed += 0.005f;
 
     if (Keyboard::isKeyboardKey(GLFW_KEY_O))
-        speed -= 0.01f;
+        speed -= 0.005f;
 
     if (speed <= 0)
         speed = 0;
-
-    position += movement;
 }
 
 //-------------------------------------------------------------------------------//
@@ -48,18 +49,19 @@ void Camera::determineRotate()
     glm::vec3 rotation_delta{0.0f, 0.0f, 0.0f};
 
     if (Keyboard::isKeyboardKey(GLFW_KEY_UP))
-        rotation_delta.y -= 0.5f;
+        rotation_delta.y -= 1.f;
     
     if (Keyboard::isKeyboardKey(GLFW_KEY_DOWN))
-        rotation_delta.y += 0.5f;
-    
+        rotation_delta.y += 1.f;
+
     if (Keyboard::isKeyboardKey(GLFW_KEY_RIGHT))
-        rotation_delta.z -= 0.5f;
+        rotation_delta.z -= 1.f;
     
     if (Keyboard::isKeyboardKey(GLFW_KEY_LEFT))
-        rotation_delta.z += 0.5f;
+        rotation_delta.z += 1.f;
 
-    rotation += rotation_delta;
+    if (glm::dot(rotation_delta, rotation_delta) > std::numeric_limits<float>::epsilon())
+        rotation += look_speed * glm::normalize(rotation_delta);
 }
 
 //-------------------------------------------------------------------------------//

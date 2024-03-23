@@ -32,7 +32,9 @@ class Camera
 
     private:
         
-        float speed = 0.1;
+        float speed         = 0.1f;
+
+        float look_speed    = 0.5f;
         
         glm::vec3 position{0.f, 0.f, 0.f};
         

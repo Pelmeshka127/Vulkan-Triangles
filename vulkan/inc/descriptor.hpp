@@ -5,10 +5,6 @@
 #include "swap_chain.hpp"
 #include "uniform_buffer.hpp"
 
-#include "vulkan/vulkan.hpp"
-#include <vulkan/vulkan_handles.hpp>
-
-
 
 namespace Vulkan 
 {

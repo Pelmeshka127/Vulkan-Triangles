@@ -1,6 +1,5 @@
 #include "window.hpp"
 #include <stdexcept>
-#include <iostream>
 
 namespace Vulkan 
 {

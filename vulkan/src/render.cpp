@@ -71,7 +71,7 @@ void Render::record(VkCommandBuffer commandBuffer, uint32_t imageIndex)
 
     vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, offsets);
     vkCmdBindIndexBuffer(commandBuffer, model_.getIndexBuffer(), 0, VK_INDEX_TYPE_UINT32);
-    vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline_.getPipelineLayout(), 0, 1,&descriptorSets_.getDescriptorSets()[currentFrame_], 0, nullptr);
+    vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipeline_.getPipelineLayout(), 0, 1, &descriptorSets_.getDescriptorSets()[currentFrame_], 0, nullptr);
     vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(model_.indices_.size()), 1, 0, 0, 0);
     
     vkCmdEndRenderPass(commandBuffer);
