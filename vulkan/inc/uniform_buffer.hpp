@@ -42,7 +42,7 @@ class UniformBuffer
         
         const std::vector<void*>& getUniformBeffersMapped() const { return uniformBuffersMapped_; }
 
-        void update(uint32_t currentImage);
+        void update(const uint32_t currentImage, const float frame_time);
 
     private:
         

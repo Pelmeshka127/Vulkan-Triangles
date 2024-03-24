@@ -1,5 +1,7 @@
 #include "app.hpp"
 
+#include <chrono>
+
 namespace Vulkan
 {
 
@@ -7,13 +9,23 @@ namespace Vulkan
 
 void App::run() 
 {
+    auto current_time = std::chrono::high_resolution_clock::now();
+
     while (!window.ShouldClose()) 
     {
         glfwPollEvents();
+
+        auto new_time = std::chrono::high_resolution_clock::now();
+
+        float frame_time = std::chrono::duration<float, std::chrono::seconds::period>(new_time - current_time).count();
+
+        // std::cout << frame_time << std::endl;
+
+        current_time = new_time;
         
         glfwSetKeyCallback(window.GetGLFWwindow(), keyCallback);
         
-        drawFrame();
+        drawFrame(frame_time);
     }
 
     vkDeviceWaitIdle(device.getDevice());
@@ -21,7 +33,7 @@ void App::run()
 
 //-------------------------------------------------------------------------------//
 
-void App::drawFrame() 
+void App::drawFrame(const float frame_time) 
 {
     if (vkWaitForFences(device.getDevice(),1, &swapChain.getInFlightFences()[render.currentFrame_], VK_TRUE, UINT64_MAX) != VK_SUCCESS)
         throw std::runtime_error("failed to wait for Fences!");
@@ -39,7 +51,7 @@ void App::drawFrame()
     else if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR) 
         throw std::runtime_error("failed to acquire swap chain image!");
 
-    uniformBuffer.update(render.currentFrame_);
+    uniformBuffer.update(render.currentFrame_, frame_time);
     
     if (vkResetFences(device.getDevice(), 1, &swapChain.getInFlightFences()[render.currentFrame_]) != VK_SUCCESS)
         throw std::runtime_error("failed to reset Fences!");

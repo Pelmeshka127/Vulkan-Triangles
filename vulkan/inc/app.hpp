@@ -68,7 +68,7 @@ class App
         
         Render render{device, swapChain, pipeline, model, descriptorSets };
         
-        void drawFrame();
+        void drawFrame(const float frame_time);
 
         static void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
 };

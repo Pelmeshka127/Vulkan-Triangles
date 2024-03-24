@@ -26,15 +26,15 @@ class Camera
         
         glm::vec3   getRotation() const { return rotation; }
 
-        void        determineMove();
+        void        determineMove(const float dt);
 
-        void        determineRotate();
+        void        determineRotate(const float dt);
 
     private:
         
-        float speed         = 0.1f;
+        float speed         = 30.f;
 
-        float look_speed    = 0.5f;
+        float look_speed    = 50.f;
         
         glm::vec3 position{0.f, 0.f, 0.f};
         

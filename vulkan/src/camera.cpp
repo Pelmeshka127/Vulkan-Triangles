@@ -7,7 +7,7 @@ namespace Vulkan
 
 //-------------------------------------------------------------------------------//
 
-void Camera::determineMove() 
+void Camera::determineMove(const float dt) 
 {
     glm::vec3 movement{0.0f, 0.0f, 0.0f};
 
@@ -30,13 +30,13 @@ void Camera::determineMove()
         movement += glm::normalize(up);
 
     if (glm::dot(movement, movement) > std::numeric_limits<float>::epsilon())
-        position += movement * speed;
+        position += movement * speed * dt;
 
     if (Keyboard::isKeyboardKey(GLFW_KEY_P))
-        speed += 0.005f;
+        speed += 1.f;
 
     if (Keyboard::isKeyboardKey(GLFW_KEY_O))
-        speed -= 0.005f;
+        speed -= 1.f;
 
     if (speed <= 0)
         speed = 0;
@@ -44,7 +44,7 @@ void Camera::determineMove()
 
 //-------------------------------------------------------------------------------//
 
-void Camera::determineRotate() 
+void Camera::determineRotate(const float dt) 
 {
     glm::vec3 rotation_delta{0.0f, 0.0f, 0.0f};
 
@@ -61,7 +61,7 @@ void Camera::determineRotate()
         rotation_delta.z += 1.f;
 
     if (glm::dot(rotation_delta, rotation_delta) > std::numeric_limits<float>::epsilon())
-        rotation += look_speed * glm::normalize(rotation_delta);
+        rotation += look_speed * dt * glm::normalize(rotation_delta);
 }
 
 //-------------------------------------------------------------------------------//
