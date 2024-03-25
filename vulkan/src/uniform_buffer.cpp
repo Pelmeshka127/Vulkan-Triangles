@@ -39,11 +39,11 @@ UniformBuffer::~UniformBuffer()
 
 //-------------------------------------------------------------------------------//
 
-void UniformBuffer::update(const uint32_t currentImage, const float frame_time) 
+void UniformBuffer::update(GLFWwindow* const window, const uint32_t currentImage, const float frame_time) 
 {
-    camera_.determineMove(frame_time);
+    camera_.determineMove(window, frame_time);
     
-    camera_.determineRotate(frame_time);
+    camera_.determineRotate(window, frame_time);
 
     camera_.updateViewMatrix();
 
