@@ -1,5 +1,7 @@
 # Vulkan-Triangles
 
+![image1](images/iwin.jpg)
+
 ## Введение
 В данном проекте реализован второй уровень задачи о [треугольниках](https://github.com/Pelmeshka127/Triangles-3D) - графическая визуализация при по помощи [Vulkan API](https://www.vulkan.org). Для знакомства с вулканом я использовал этот [ресурс](https://www.youtube.com/playlist?list=PL8327DO66nu9qYVKLDmdLW_84-yE4auCR).
 
@@ -57,4 +59,3 @@ make
 ```
 
 Приятного просмотра!
-![image2](images/oleg.jpg)
